@@ -14,8 +14,10 @@ from bot import (
     drives_names,
     excluded_extensions,
     index_urls,
+    nzb_options,
     qbit_options,
     rss_dict,
+    sabnzbd_client,
     shorteners_list,
     sudo_users,
     user_data,
@@ -49,6 +51,11 @@ async def update_aria2_options():
         aria2_options.update(op)
     else:
         await TorrentManager.aria2.changeGlobalOption(aria2_options)
+
+
+async def update_nzb_options():
+    no = (await sabnzbd_client.get_config())["config"]["misc"]
+    nzb_options.update(no)
 
 
 async def load_settings():
@@ -108,6 +115,17 @@ async def load_settings():
         ):
             qbit_options.update(qbit_opt)
 
+        if nzb_opt := await database.db.settings.nzb.find_one(
+            {"_id": BOT_ID},
+            {"_id": 0},
+        ):
+            if await aiopath.exists("sabnzbd/SABnzbd.ini.bak"):
+                await remove("sabnzbd/SABnzbd.ini.bak")
+            ((key, value),) = nzb_opt.items()
+            file_ = key.replace("__", ".")
+            async with aiopen(f"sabnzbd/{file_}", "wb+") as f:
+                await f.write(value)
+
         if await database.db.users.find_one():
             for p in ["thumbnails", "tokens", "rclone"]:
                 if not await aiopath.exists(p):
@@ -160,6 +178,14 @@ async def save_settings():
         )
     if await database.db.settings.qbittorrent.find_one({"_id": TgClient.ID}) is None:
         await database.save_qbit_settings()
+    if await database.db.settings.nzb.find_one({"_id": TgClient.ID}) is None:
+        async with aiopen("sabnzbd/SABnzbd.ini", "rb+") as pf:
+            nzb_conf = await pf.read()
+        await database.db.settings.nzb.update_one(
+            {"_id": TgClient.ID},
+            {"$set": {"SABnzbd__ini": nzb_conf}},
+            upsert=True,
+        )
 
 
 async def update_variables():

@@ -7,7 +7,7 @@ from aiofiles import open as aiopen
 from aiofiles.os import path as aiopath
 from aiofiles.os import remove
 
-from bot import LOGGER, intervals, scheduler
+from bot import LOGGER, intervals, sabnzbd_client, scheduler
 from bot.core.aeon_client import TgClient
 from bot.core.config_manager import Config
 from bot.core.jdownloader_booter import jdownloader
@@ -119,11 +119,21 @@ async def confirm_restart(_, query):
             qb.cancel()
         if jd := intervals["jd"]:
             jd.cancel()
+        if nzb := intervals["nzb"]:
+            nzb.cancel()
         if st := intervals["status"]:
             for intvl in list(st.values()):
                 intvl.cancel()
         await clean_all()
         await TorrentManager.close_all()
+        if sabnzbd_client.LOGGED_IN:
+            await gather(
+                sabnzbd_client.pause_all(),
+                sabnzbd_client.delete_job("all", True),
+                sabnzbd_client.purge_all(True),
+                sabnzbd_client.delete_history("all", delete_files=True),
+            )
+            await sabnzbd_client.close()
         if jdownloader.is_connected:
             await gather(
                 jdownloader.device.downloadcontroller.stop_downloads(),
@@ -139,7 +149,7 @@ async def confirm_restart(_, query):
             "pkill",
             "-9",
             "-f",
-            "gunicorn|xria|xnox|xtra|xone|java|7z|split",
+            "gunicorn|xria|xnox|xtra|xone|xnzb|java|7z|split",
         )
         proc2 = await create_subprocess_exec("python3", "update.py")
         await gather(proc1.wait(), proc2.wait())

@@ -94,6 +94,7 @@ class TaskConfig:
         self.is_leech = False
         self.is_jd = False
         self.is_qbit = False
+        self.is_nzb = False
         self.is_clone = False
         self.is_ytdlp = False
         self.user_transmission = False
@@ -547,6 +548,7 @@ class TaskConfig:
             self.is_qbit,
             self.is_leech,
             self.is_jd,
+            self.is_nzb,
             self.same_dir,
             self.bulk,
             self.multi_tag,
@@ -586,6 +588,7 @@ class TaskConfig:
                 self.is_qbit,
                 self.is_leech,
                 self.is_jd,
+                self.is_nzb,
                 self.same_dir,
                 self.bulk,
                 self.multi_tag,

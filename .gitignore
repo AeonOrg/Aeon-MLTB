@@ -11,6 +11,7 @@ Images/*
 thumbnails/*
 rclone/*
 tokens/*
+sabnzbd/*
 list_drives.txt
 shorteners.txt
 cookies.txt

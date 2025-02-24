@@ -36,6 +36,8 @@ METADATA_KEY = ""
 WATERMARK_KEY = ""
 LOG_CHAT_ID = 0
 LEECH_FILENAME_CAPTION = ""
+HYDRA_IP = ""
+HYDRA_API_KEY = ""
 
 # GDrive Tools
 GDRIVE_ID = ""
@@ -54,6 +56,28 @@ RCLONE_SERVE_PASS = ""
 # Mega credentials
 MEGA_EMAIL = ""
 MEGA_PASSWORD = ""
+
+# Sabnzbd
+USENET_SERVERS = [
+    {
+        "name": "main",
+        "host": "",
+        "port": 563,
+        "timeout": 60,
+        "username": "",
+        "password": "",
+        "connections": 8,
+        "ssl": 1,
+        "ssl_verify": 2,
+        "ssl_ciphers": "",
+        "enable": 1,
+        "required": 0,
+        "optional": 0,
+        "retention": 0,
+        "send_group": 0,
+        "priority": 0,
+    },
+]
 
 # Update
 UPSTREAM_REPO = "https://github.com/AeonOrg/Aeon-MLTB"

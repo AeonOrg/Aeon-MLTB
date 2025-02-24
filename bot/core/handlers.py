@@ -200,6 +200,21 @@ def add_handlers():
             BotCommands.BroadcastCommand,
             CustomFilters.owner,
         ),
+        "nzb_mirror": (
+            nzb_mirror,
+            BotCommands.NzbMirrorCommand,
+            CustomFilters.authorized,
+        ),
+        "nzb_leech": (
+            nzb_leech,
+            BotCommands.NzbLeechCommand,
+            CustomFilters.authorized,
+        ),
+        "hydra_search": (
+            hydra_search,
+            BotCommands.HydraSearchCommamd,
+            CustomFilters.authorized,
+        ),
     }
 
     for handler_func, command_name, custom_filter in command_filters.values():

@@ -13,6 +13,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
+from sabnzbdapi import SabnzbdClient
 from web.nodes import extract_file_ids, make_tree
 
 getLogger("httpx").setLevel(WARNING)
@@ -20,10 +21,15 @@ getLogger("aiohttp").setLevel(WARNING)
 
 aria2 = None
 qbittorrent = None
+sabnzbd_client = SabnzbdClient(
+    host="http://localhost",
+    api_key="mltb",
+    port="8070",
+)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_: FastAPI):
     global aria2, qbittorrent
     aria2 = Aria2HttpClient("http://localhost:6800/jsonrpc")
     qbittorrent = await create_client("http://localhost:8090/api/v2/")
@@ -160,7 +166,9 @@ async def handle_torrent(request: Request):
                 }
         else:
             selected_files, unselected_files = extract_file_ids(data)
-            if len(gid) > 20:
+            if gid.startswith("SABnzbd_nzo"):
+                await set_sabnzbd(gid, unselected_files)
+            elif len(gid) > 20:
                 await set_qbittorrent(gid, selected_files, unselected_files)
             else:
                 selected_files = ",".join(selected_files)
@@ -173,7 +181,10 @@ async def handle_torrent(request: Request):
             }
     else:
         try:
-            if len(gid) > 20:
+            if gid.startswith("SABnzbd_nzo"):
+                res = await sabnzbd_client.get_files(gid)
+                content = make_tree(res, "sabnzbd")
+            elif len(gid) > 20:
                 res = await qbittorrent.torrents.files(gid)
                 content = make_tree(res, "qbittorrent")
             else:
@@ -202,6 +213,11 @@ async def handle_rename(gid, data):
             await qbittorrent.torrents.rename_folder(hash=gid, **data)
     except (ClientError, TimeoutError) as e:
         LOGGER.error(f"{e} Errored in renaming")
+
+
+async def set_sabnzbd(gid, unselected_files):
+    await sabnzbd_client.remove_file(gid, unselected_files)
+    LOGGER.info(f"Verified! nzo_id: {gid}")
 
 
 async def set_qbittorrent(gid, selected_files, unselected_files):

@@ -55,7 +55,7 @@ async def get_task_by_gid(gid: str):
         for task in task_dict.values():
             if hasattr(task, "seeding"):
                 await task.update()
-            if task.gid().startswith(gid):
+            if task.gid().startswith(gid) or task.gid().endswith(gid):
                 return task
         return None
 
@@ -250,7 +250,9 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
         else:
             msg += f"\n<b>Size: </b>{task.size()}"
         msg += f"\n<b>Tool:</b> {task.tool}"
-        msg += f"\n/stop_{task.gid()[:8]}\n\n"
+        task_gid = task.gid()
+        short_gid = task_gid[-8:] if task_gid.startswith("SABnzbd") else task_gid[:8]
+        msg += f"\n/stop_{short_gid}\n\n"
 
     if len(msg) == 0:
         if status == "All":

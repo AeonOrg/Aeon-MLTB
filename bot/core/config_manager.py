@@ -46,17 +46,18 @@ class Config:
     SUDO_USERS: str = ""
     TELEGRAM_API: int = 0
     TELEGRAM_HASH: str = ""
-    TG_PROXY = None
+    TG_PROXY: dict | None = None
     THUMBNAIL_LAYOUT: str = ""
     TORRENT_TIMEOUT: int = 0
-    UPLOAD_PATHS = {}
+    UPLOAD_PATHS: dict = {}
     UPSTREAM_REPO: str = ""
+    USENET_SERVERS: list = []
     UPSTREAM_BRANCH: str = "main"
     USER_SESSION_STRING: str = ""
     USER_TRANSMISSION: bool = False
     USE_SERVICE_ACCOUNTS: bool = False
     WEB_PINCODE: bool = False
-    YT_DLP_OPTIONS: str = {}
+    YT_DLP_OPTIONS: dict = {}
 
     # INKYPINKY
     METADATA_KEY: str = ""
@@ -69,6 +70,8 @@ class Config:
     FSUB_IDS: str = ""
     LOG_CHAT_ID: int = 0
     LEECH_FILENAME_CAPTION: str = ""
+    HYDRA_IP: str = ""
+    HYDRA_API_KEY: str = ""
 
     @classmethod
     def get(cls, key):
@@ -115,6 +118,12 @@ class Config:
                         and value
                     ):
                         value = value.strip("/")
+                    elif attr == "USENET_SERVERS":
+                        try:
+                            if not value[0].get("host"):
+                                continue
+                        except Exception:
+                            continue
                     setattr(cls, attr, value)
 
     @classmethod
@@ -133,6 +142,12 @@ class Config:
                     and value
                 ):
                     value = value.strip("/")
+                elif key == "USENET_SERVERS":
+                    try:
+                        if not value[0].get("host"):
+                            value = []
+                    except Exception:
+                        value = []
                 setattr(cls, key, value)
 
 

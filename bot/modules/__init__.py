@@ -16,7 +16,10 @@ from .mirror_leech import (
     jd_mirror,
     leech,
     mirror,
+    nzb_leech,
+    nzb_mirror,
 )
+from .nzbsearch import hydra_search
 from .restart import (
     confirm_restart,
     restart_bot,
@@ -63,6 +66,7 @@ __all__ = [
     "get_packages_version",
     "get_rss_menu",
     "get_users_settings",
+    "hydra_search",
     "initiate_search_tools",
     "jd_leech",
     "jd_mirror",
@@ -70,6 +74,8 @@ __all__ = [
     "log",
     "mediainfo",
     "mirror",
+    "nzb_leech",
+    "nzb_mirror",
     "ping",
     "remove_from_queue",
     "remove_sudo",

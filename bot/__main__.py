@@ -24,6 +24,8 @@ COMMANDS = {
     "LeechCommand": "- Start leeching",
     "JdMirrorCommand": "- Mirror using Jdownloader",
     "JdLeechCommand": "- Leech using jdownloader",
+    "NzbMirrorCommand": "- Mirror nzb files",
+    "NzbLeechCommand": "- Leech nzb files",
     "YtdlCommand": "- Mirror yt-dlp supported link",
     "YtdlLeechCommand": "- Leech through yt-dlp supported link",
     "CloneCommand": "- Copy file/folder to Drive",
@@ -69,6 +71,7 @@ async def main():
         load_configurations,
         save_settings,
         update_aria2_options,
+        update_nzb_options,
         update_qb_options,
         update_variables,
     )
@@ -81,6 +84,7 @@ async def main():
     await gather(
         update_qb_options(),
         update_aria2_options(),
+        update_nzb_options(),
     )
     from .core.jdownloader_booter import jdownloader
     from .helper.ext_utils.files_utils import clean_all

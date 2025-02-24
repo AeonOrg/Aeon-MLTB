@@ -72,7 +72,7 @@ try:
         for key, value in vars(settings).items()
     }
 except Exception:
-    log_error(
+    log_info(
         "The 'config.py' file is missing! Falling back to environment variables.",
     )
     config_file = {}
