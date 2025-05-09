@@ -10,6 +10,7 @@ class Config:
     BASE_URL: str = ""
     BASE_URL_PORT: int = 80
     BOT_TOKEN: str = ""
+    BOT_USERNAME: str = ""
     CMD_SUFFIX: str = ""
     DATABASE_URL: str = ""
     DEFAULT_UPLOAD: str = "rc"

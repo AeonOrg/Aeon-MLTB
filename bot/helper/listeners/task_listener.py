@@ -20,6 +20,7 @@ from bot import (
     task_dict,
     task_dict_lock,
 )
+from bot.core.aeon_client import TgClient
 from bot.core.config_manager import Config
 from bot.core.torrent_manager import TorrentManager
 from bot.helper.common import TaskConfig
@@ -381,14 +382,14 @@ class TaskListener(TaskConfig):
             and Config.DATABASE_URL
         ):
             await database.rm_complete_task(self.message.link)
-        msg = f"<b>Name: </b><code>{escape(self.name)}</code>\n\n<b>Size: </b>{get_readable_file_size(self.size)}"
-        done_msg = f"{self.tag}\nYour task is complete\nPlease check your inbox."
+        msg = f"<blockquote expandable>Name: {escape(self.name)}</blockquote>\n\n<blockquote expandable>Size: {get_readable_file_size(self.size)}"
+        done_msg = f"<blockquote><b>Hey, {self.tag}</blockquote>\n<blockquote expandable>Your task is complete\nPlease check your inbox.</b></blockquote>"
         LOGGER.info(f"Task Done: {self.name}")
         if self.is_leech:
             msg += f"\n<b>Total Files: </b>{folders}"
             if mime_type != 0:
                 msg += f"\n<b>Corrupted Files: </b>{mime_type}"
-            msg += f"\n<b>cc: </b>{self.tag}\n\n"
+            msg += f"\n<b>cc: </b>{self.tag}</blockquote>\n\n"
             if not files:
                 await send_message(self.message, msg)
             else:
@@ -417,7 +418,21 @@ class TaskListener(TaskConfig):
                             int(Config.LOG_CHAT_ID),
                             f"{msg}<blockquote expandable>{fmsg}</blockquote>",
                         )
-                await send_message(self.message, done_msg)
+                buttons = ButtonMaker()
+                buttons.url_button("Go to Inbox", f"https://t.me/{Config.BOT_USERNAME.lstrip("@").strip()}")
+                button = buttons.build_menu(1)
+
+                if not Config.BOT_USERNAME:
+                    await send_message(
+                        self.message,
+                        done_msg + "\n\n<spoiler>Add bot username in botsettings to get an inbox button</spoiler>"
+                    )
+                else:
+                    await send_message(
+                        self.message,
+                        done_msg,
+                        button
+                    )
         else:
             msg += f"\n\n<b>Type: </b>{mime_type}"
             if mime_type == "Folder":
@@ -458,6 +473,7 @@ class TaskListener(TaskConfig):
             await send_message(self.user_id, msg, button)
             if Config.LOG_CHAT_ID:
                 await send_message(int(Config.LOG_CHAT_ID), msg, button)
+                await send_message(self.message, done_msg)
             await send_message(self.message, done_msg)
         if self.seed:
             await clean_target(self.up_dir)
