@@ -211,13 +211,15 @@ Index URL is <code>{index}</code>
 Stop Duplicate is <b>{sd_msg}</b>"""
     elif stype == "gofile":
         buttons.data_button("GoFile Token", f"userset {user_id} menu GOFILE_TOKEN")
-        buttons.data_button("GoFile Folder ID", f"userset {user_id} menu GOFILE_FOLDER_ID")
+        buttons.data_button(
+            "GoFile Folder ID", f"userset {user_id} menu GOFILE_FOLDER_ID"
+        )
         buttons.data_button("Back", f"userset {user_id} back")
         buttons.data_button("Close", f"userset {user_id} close")
-        
+
         gofile_token = "Set" if user_dict.get("GOFILE_TOKEN", False) else "Not Set"
         gofile_folder = user_dict.get("GOFILE_FOLDER_ID", "None") or "None"
-        
+
         text = f"""<u>GoFile Settings for {name}</u>
 GoFile Token is <b>{gofile_token}</b>
 GoFile Folder ID is <code>{gofile_folder}</code>"""

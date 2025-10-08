@@ -57,7 +57,9 @@ class GoFileUpload:
 
         user_dict = user_data.get(self.listener.user_id, {})
         self.token = user_dict.get("GOFILE_TOKEN") or Config.GOFILE_API
-        self.folder_id = user_dict.get("GOFILE_FOLDER_ID") or Config.GOFILE_FOLDER_ID or ""
+        self.folder_id = (
+            user_dict.get("GOFILE_FOLDER_ID") or Config.GOFILE_FOLDER_ID or ""
+        )
 
     @property
     def speed(self):
