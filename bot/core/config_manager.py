@@ -21,6 +21,7 @@ class Config:
     FFMPEG_CMDS: ClassVar[dict[str, list[str]]] = {}
     FILELION_API: str = ""
     GDRIVE_ID: str = ""
+    GOFILE_API: str = ""
     INCOMPLETE_TASK_NOTIFIER: bool = False
     INDEX_URL: str = ""
     JD_EMAIL: str = ""
@@ -141,7 +142,7 @@ class Config:
             value = value.strip()
 
         if key == "DEFAULT_UPLOAD":
-            if value.lower() not in ["yt", "gd", "rc"]:
+            if value.lower() not in ["yt", "gd", "rc", "gofile"]:
                 return "gd"
             return value.lower()
 

@@ -391,6 +391,18 @@ class TaskListener(TaskConfig):
                 sync_to_async(yt.upload),
             )
             del yt
+        elif self.up_dest == "gofile":
+            LOGGER.info(f"GoFile Upload Name: {self.name}")
+            from ..mirror_leech_utils.gofile_utils.upload import GoFileUpload
+            from ..mirror_leech_utils.status_utils.gofile_status import GoFileStatus
+            gofile = GoFileUpload(self, up_path)
+            async with task_dict_lock:
+                task_dict[self.mid] = GoFileStatus(self, gofile, gid, "up")
+            await gather(
+                update_status_message(self.message.chat.id),
+                gofile.upload(),
+            )
+            del gofile
         elif is_gdrive_id(self.up_dest):
             LOGGER.info(f"Uploading to Google Drive: {self.name}")
             drive = GoogleDriveUpload(self, up_path)
