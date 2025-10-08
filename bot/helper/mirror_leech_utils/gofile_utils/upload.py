@@ -185,7 +185,12 @@ class GoFileUpload:
                                 "data": {"downloadPage": "Uploaded"},
                             }
                         except JSONDecodeError:
-                            return None
+                            return {
+                                "status": "ok", 
+                                "data": {"downloadPage": "Uploaded"},
+                            }
+                    else:
+                        raise Exception(f"HTTP {resp.status}: {await resp.text()}")
         return None
 
     async def create_folder(self, parentFolderId, folderName):
