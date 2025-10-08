@@ -186,7 +186,7 @@ class GoFileUpload:
                             }
                         except JSONDecodeError:
                             return {
-                                "status": "ok", 
+                                "status": "ok",
                                 "data": {"downloadPage": "Uploaded"},
                             }
                     else:
