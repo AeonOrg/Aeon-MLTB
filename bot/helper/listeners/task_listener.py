@@ -393,8 +393,13 @@ class TaskListener(TaskConfig):
             del yt
         elif self.up_dest == "gofile":
             LOGGER.info(f"GoFile Upload Name: {self.name}")
-            from ..mirror_leech_utils.gofile_utils.upload import GoFileUpload
-            from ..mirror_leech_utils.status_utils.gofile_status import GoFileStatus
+            from bot.helper.mirror_leech_utils.gofile_utils.upload import (
+                GoFileUpload,
+            )
+            from bot.helper.mirror_leech_utils.status_utils.gofile_status import (
+                GoFileStatus,
+            )
+
             gofile = GoFileUpload(self, up_path)
             async with task_dict_lock:
                 task_dict[self.mid] = GoFileStatus(self, gofile, gid, "up")
