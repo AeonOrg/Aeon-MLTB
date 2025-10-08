@@ -418,6 +418,8 @@ Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp
 - <b>Playlist & Individuals</b>: Uploads the folder as a new playlist AND also makes each video available individually.
 Timeout: 60 sec""",
     "YT_ADD_TO_PLAYLIST_ID": "Enter the YouTube Playlist ID you want your videos to be added to. If set, newly uploaded videos will be added to this playlist. Leave empty or set to 'None' to not automatically add to a specific playlist (unless creating a new one for a folder upload without this setting). Timeout: 60 sec",
+    "GOFILE_TOKEN": "Send your GoFile API token. You can get it from https://gofile.io/myProfile. This token will be used to upload files to your GoFile account. Timeout: 60 sec",
+    "GOFILE_FOLDER_ID": "Send your GoFile folder ID where you want to upload files. If not set, files will be uploaded to your account root. You can get folder ID from the GoFile URL. Example: for https://gofile.io/d/abcd123, the folder ID is abcd123. Timeout: 60 sec",
 }
 
 help_string = f"""

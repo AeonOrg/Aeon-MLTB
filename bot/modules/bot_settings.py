@@ -58,6 +58,8 @@ DEFAULT_VALUES = {
     "RSS_DELAY": 600,
     "UPSTREAM_BRANCH": "main",
     "DEFAULT_UPLOAD": "gd",
+    "GOFILE_API": "",
+    "GOFILE_FOLDER_ID": "",
 }
 
 

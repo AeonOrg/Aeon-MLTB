@@ -22,6 +22,7 @@ class Config:
     FILELION_API: str = ""
     GDRIVE_ID: str = ""
     GOFILE_API: str = ""
+    GOFILE_FOLDER_ID: str = ""
     INCOMPLETE_TASK_NOTIFIER: bool = False
     INDEX_URL: str = ""
     JD_EMAIL: str = ""

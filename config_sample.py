@@ -16,6 +16,7 @@ SUDO_USERS = ""  # Space separated user_id for sudo access
 DEFAULT_UPLOAD = ""  # Default uploader if -ul is not specified. Options: "yt" (YouTube), "gd" (Google Drive), "rc" (Rclone), "gofile" (GoFile), or "" (empty for no specific default).
 FILELION_API = ""
 GOFILE_API = ""  # GoFile API token for uploading files to GoFile.io (get from https://gofile.io/myProfile)
+GOFILE_FOLDER_ID = ""  # Default GoFile folder ID for uploads. If not set, files upload to account root.
 STREAMWISH_API = ""
 EXCLUDED_EXTENSIONS = (
     ""  # Space separated file extensions to exclude (e.g., .log .exe)
