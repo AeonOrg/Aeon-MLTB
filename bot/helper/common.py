@@ -309,7 +309,9 @@ class TaskConfig:
                 not self.up_dest and default_upload == "gd"
             ) or self.up_dest == "gd":
                 self.up_dest = self.user_dict.get("GDRIVE_ID") or Config.GDRIVE_ID
-            elif (not self.up_dest and default_upload == "gofile") or self.up_dest in ["gofile", "gf"]:
+            elif (
+                not self.up_dest and default_upload == "gofile"
+            ) or self.up_dest in ["gofile", "gf"]:
                 self.up_dest = "gofile"
 
             chosen_service = ""
@@ -325,10 +327,12 @@ class TaskConfig:
                 raise ValueError(
                     f"No Upload Destination path/ID for service '{chosen_service}'! Please set an upload path or a default for it."
                 )
-            elif self.up_dest == "gofile":
+            if self.up_dest == "gofile":
                 user_token = self.user_dict.get("GOFILE_TOKEN")
                 if not user_token and not Config.GOFILE_API:
-                    raise ValueError("GoFile API token not configured! Please set your GoFile token in user settings or configure a global token.")
+                    raise ValueError(
+                        "GoFile API token not configured! Please set your GoFile token in user settings or configure a global token."
+                    )
             if is_gdrive_id(self.up_dest):
                 if not self.up_dest.startswith(
                     ("mtp:", "tp:", "sa:"),

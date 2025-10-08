@@ -1,24 +1,25 @@
-from aiofiles.os import path as aiopath, rename as aiorename
-from aiohttp import ClientSession, FormData
-from aiohttp.client_exceptions import ContentTypeError
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
 from io import BufferedReader
 from json import JSONDecodeError
 from logging import getLogger
-from os import path as ospath, walk as oswalk
+from os import path as ospath
+from os import walk as oswalk
 from pathlib import Path
 from random import choice
+
+from aiofiles.os import path as aiopath
+from aiofiles.os import rename as aiorename
+from aiohttp import ClientSession
+from aiohttp.client_exceptions import ContentTypeError
 from tenacity import (
-    retry,
-    wait_exponential,
-    stop_after_attempt,
-    retry_if_exception_type,
     RetryError,
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
 )
 
-from ....core.config_manager import Config
-from ...ext_utils.bot_utils import SetInterval, sync_to_async
+from bot.core.config_manager import Config
+from bot.helper.ext_utils.bot_utils import SetInterval, sync_to_async
 
 LOGGER = getLogger(__name__)
 
@@ -50,9 +51,10 @@ class GoFileUpload:
         self.total_folders = 0
         self.is_uploading = True
         self.update_interval = 3
-        
+
         # Get user-specific token or fall back to global config
-        from .... import user_data
+        from bot import user_data
+
         user_dict = user_data.get(self.listener.user_id, {})
         self.token = user_dict.get("GOFILE_TOKEN") or Config.GOFILE_API
         self.folder_id = user_dict.get("GOFILE_FOLDER_ID", "")
@@ -81,18 +83,20 @@ class GoFileUpload:
         if token is None:
             return False
 
-        async with ClientSession() as session:
-            async with session.get(
+        async with (
+            ClientSession() as session,
+            session.get(
                 f"https://api.gofile.io/accounts/getid?token={token}"
-            ) as resp:
-                res = await resp.json()
+            ) as resp,
+        ):
+            res = await resp.json()
 
-                if res["status"] == "ok":
-                    acc_id = res["data"]["id"]
-                    async with session.get(
-                        f"https://api.gofile.io/accounts/{acc_id}?token={token}"
-                    ) as resp:
-                        return (await resp.json())["status"] == "ok"
+            if res["status"] == "ok":
+                acc_id = res["data"]["id"]
+                async with session.get(
+                    f"https://api.gofile.io/accounts/{acc_id}?token={token}"
+                ) as resp:
+                    return (await resp.json())["status"] == "ok"
         return False
 
     async def __resp_handler(self, response):
@@ -113,22 +117,23 @@ class GoFileUpload:
         if self.token is None:
             raise Exception("GoFile API token not found!")
 
-        async with ClientSession() as session:
-            async with session.get(
-                f"{self.api_url}accounts/getid?token={self.token}"
-            ) as resp:
-                res = await resp.json()
-                if res["status"] == "ok":
-                    acc_id = res["data"]["id"]
-                    async with session.get(
-                        f"{self.api_url}accounts/{acc_id}?token={self.token}"
-                    ) as resp2:
-                        res2 = await resp2.json()
-                        return (
-                            res2["status"] == "ok"
-                            if check_account
-                            else await self.__resp_handler(res2)
-                        )
+        async with (
+            ClientSession() as session,
+            session.get(f"{self.api_url}accounts/getid?token={self.token}") as resp,
+        ):
+            res = await resp.json()
+            if res["status"] == "ok":
+                acc_id = res["data"]["id"]
+                async with session.get(
+                    f"{self.api_url}accounts/{acc_id}?token={self.token}"
+                ) as resp2:
+                    res2 = await resp2.json()
+                    return (
+                        res2["status"] == "ok"
+                        if check_account
+                        else await self.__resp_handler(res2)
+                    )
+        return None
 
     async def __setOptions(self, contentId, option, value):
         if self.token is None:
@@ -136,24 +141,26 @@ class GoFileUpload:
 
         if option not in [
             "name",
-            "description", 
+            "description",
             "tags",
             "public",
             "expiry",
             "password",
         ]:
             raise Exception(f"Invalid GoFile Option Specified: {option}")
-        
-        async with ClientSession() as session:
-            async with session.put(
+
+        async with (
+            ClientSession() as session,
+            session.put(
                 url=f"{self.api_url}contents/{contentId}/update",
                 data={
                     "token": self.token,
                     "attribute": option,
                     "attributeValue": value,
                 },
-            ) as resp:
-                return await self.__resp_handler(await resp.json())
+            ) as resp,
+        ):
+            return await self.__resp_handler(await resp.json())
 
     @retry(
         wait=wait_exponential(multiplier=2, min=4, max=8),
@@ -171,24 +178,30 @@ class GoFileUpload:
                         try:
                             return await resp.json()
                         except ContentTypeError:
-                            return {"status": "ok", "data": {"downloadPage": "Uploaded"}}
+                            return {
+                                "status": "ok",
+                                "data": {"downloadPage": "Uploaded"},
+                            }
                         except JSONDecodeError:
                             return None
+        return None
 
     async def create_folder(self, parentFolderId, folderName):
         if self.token is None:
             raise Exception("GoFile API token not found!")
 
-        async with ClientSession() as session:
-            async with session.post(
+        async with (
+            ClientSession() as session,
+            session.post(
                 url=f"{self.api_url}contents/createFolder",
                 data={
                     "token": self.token,
                     "parentFolderId": parentFolderId,
                     "folderName": folderName,
                 },
-            ) as resp:
-                return await self.__resp_handler(await resp.json())
+            ) as resp,
+        ):
+            return await self.__resp_handler(await resp.json())
 
     async def upload_file(
         self,
@@ -204,7 +217,7 @@ class GoFileUpload:
 
         server = choice((await self.__getServer())["servers"])["name"]
         req_dict = {}
-        
+
         if self.token:
             req_dict["token"] = self.token
         if folderId:
@@ -219,14 +232,14 @@ class GoFileUpload:
             req_dict["expire"] = expire
 
         if self.listener.is_cancelled:
-            return
-            
+            return None
+
         # Replace spaces with dots in filename
         new_path = ospath.join(
             ospath.dirname(path), ospath.basename(path).replace(" ", ".")
         )
         await aiorename(path, new_path)
-        
+
         upload_file = await self.upload_aiohttp(
             f"https://{server}.gofile.io/contents/uploadfile",
             new_path,
@@ -257,20 +270,26 @@ class GoFileUpload:
             main_folder_code = None
 
         folder_ids = {".": parent_folder_id}
-        
-        for root, dirs, files in await sync_to_async(oswalk, input_directory):
+
+        for root, _dirs, files in await sync_to_async(oswalk, input_directory):
             if self.listener.is_cancelled:
                 break
-                
+
             rel_path = ospath.relpath(root, input_directory)
-            current_folder_id = folder_ids.get(ospath.dirname(rel_path), parent_folder_id)
-            
+            current_folder_id = folder_ids.get(
+                ospath.dirname(rel_path), parent_folder_id
+            )
+
             # Create folders for current directory
             if rel_path != ".":
                 folder_name = ospath.basename(rel_path)
-                curr_folder_data = await self.create_folder(current_folder_id, folder_name)
+                curr_folder_data = await self.create_folder(
+                    current_folder_id, folder_name
+                )
                 await self.__setOptions(
-                    contentId=curr_folder_data["folderId"], option="public", value="true"
+                    contentId=curr_folder_data["folderId"],
+                    option="public",
+                    value="true",
                 )
                 folder_ids[rel_path] = curr_folder_data["folderId"]
                 current_folder_id = curr_folder_data["folderId"]
@@ -280,7 +299,7 @@ class GoFileUpload:
             for file in files:
                 if self.listener.is_cancelled:
                     break
-                    
+
                 file_path = ospath.join(root, file)
                 await self.upload_file(file_path, current_folder_id)
                 self.total_files += 1
@@ -291,13 +310,15 @@ class GoFileUpload:
         try:
             LOGGER.info(f"GoFile Uploading: {self._path}")
             self._updater = SetInterval(self.update_interval, self.progress)
-            
+
             if not self.token:
-                raise ValueError("GoFile API token not configured! Please set your GoFile token in user settings or configure a global token.")
-            
+                raise ValueError(
+                    "GoFile API token not configured! Please set your GoFile token in user settings or configure a global token."
+                )
+
             # Run the async process directly
             await self._upload_process()
-            
+
         except Exception as err:
             if isinstance(err, RetryError):
                 LOGGER.info(f"Total Attempts: {err.last_attempt.attempt_number}")
@@ -309,9 +330,9 @@ class GoFileUpload:
         finally:
             if self._updater:
                 self._updater.cancel()
-            if self.listener.is_cancelled and not self._is_errored:
-                return
-            elif self._is_errored:
+            if (
+                self.listener.is_cancelled and not self._is_errored
+            ) or self._is_errored:
                 return
 
     async def _upload_process(self):
@@ -320,7 +341,9 @@ class GoFileUpload:
 
         if await aiopath.isfile(self._path):
             # Single file upload
-            file_result = await self.upload_file(path=self._path, folderId=self.folder_id)
+            file_result = await self.upload_file(
+                path=self._path, folderId=self.folder_id
+            )
             if file_result and file_result.get("downloadPage"):
                 link = file_result["downloadPage"]
                 mime_type = "File"
@@ -340,7 +363,7 @@ class GoFileUpload:
 
         if self.listener.is_cancelled:
             return
-            
+
         LOGGER.info(f"Uploaded To GoFile: {self.listener.name}")
         await self.listener.on_upload_complete(
             link,
