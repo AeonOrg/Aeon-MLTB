@@ -5,7 +5,7 @@ from uuid import uuid4
 from aiofiles import open as aiopen
 
 from bot import LOGGER, user_data
-from bot.core.aeon_client import TgClient
+from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
 from bot.helper.ext_utils.bot_utils import new_task
 from bot.helper.ext_utils.db_handler import database

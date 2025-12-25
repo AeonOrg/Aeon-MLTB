@@ -9,7 +9,7 @@ from bot import LOGGER
 from bot.helper.ext_utils.bot_utils import cmd_exec, new_task
 from myjd import MyJdApi
 
-from .aeon_client import TgClient
+from .telegram_manager import TgClient
 from .config_manager import Config
 
 

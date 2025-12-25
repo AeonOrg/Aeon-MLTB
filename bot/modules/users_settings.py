@@ -12,7 +12,7 @@ from pyrogram.filters import create
 from pyrogram.handlers import MessageHandler
 
 from bot import auth_chats, excluded_extensions, sudo_users, user_data
-from bot.core.aeon_client import TgClient
+from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
 from bot.helper.ext_utils.bot_utils import (
     get_size_bytes,
@@ -334,7 +334,7 @@ Add to Playlist ID: <code>{yt_add_to_playlist_id}</code>"""
 
         ns_msg = "Added" if user_dict.get("NAME_SUBSTITUTE", False) else "None"
         buttons.data_button(
-            "Name Subtitute",
+            "Name Substitute",
             f"userset {user_id} menu NAME_SUBSTITUTE",
         )
         if user_dict.get("NAME_PREFIX", False):
@@ -486,6 +486,8 @@ async def set_option(_, message, option):
         for x in fx:
             x = x.lstrip(".")
             value.append(x.strip().lower())
+    elif option == "INDEX_URL":
+        value = value.
     elif option in ["UPLOAD_PATHS", "FFMPEG_CMDS", "YT_DLP_OPTIONS"]:
         if value.startswith("{") and value.endswith("}"):
             try:
@@ -579,7 +581,7 @@ async def ffmpeg_variables(
     if ffc:
         buttons = ButtonMaker()
         if key is None:
-            msg = "Choose which key you want to fill/edit varibales in it:"
+            msg = "Choose which key you want to fill/edit variables in it:"
             for k, v in list(ffc.items()):
                 add = False
                 for i in v:

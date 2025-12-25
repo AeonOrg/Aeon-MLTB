@@ -9,7 +9,7 @@ from truelink.exceptions import TrueLinkException
 from truelink.types import FolderResult, LinkResult
 
 from bot import DOWNLOAD_DIR, LOGGER, bot_loop, task_dict_lock
-from bot.core.aeon_client import TgClient
+from bot.core.telegram_manager import TgClient
 from bot.helper.aeon_utils.access_check import error_check
 from bot.helper.ext_utils.bot_utils import (
     COMMAND_USAGE,
@@ -220,9 +220,9 @@ class Mirror(TaskListener):
 
         if not isinstance(is_bulk, bool):
             dargs = is_bulk.split(":")
-            bulk_start = dargs[0] or 0
+            bulk_start = dargs[0] or "0"
             if len(dargs) == 2:
-                bulk_end = dargs[1] or 0
+                bulk_end = dargs[1] or "0"
             is_bulk = True
 
         if not is_bulk:

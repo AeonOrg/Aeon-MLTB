@@ -8,7 +8,7 @@ from bot import (
     LOGGER,
     user_data,
 )
-from bot.core.aeon_client import TgClient
+from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
 from bot.helper.aeon_utils.shorteners import short
 from bot.helper.ext_utils.db_handler import database

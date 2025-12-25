@@ -8,7 +8,7 @@ from traceback import format_exc
 from aiofiles import open as aiopen
 
 from bot import LOGGER
-from bot.core.aeon_client import TgClient
+from bot.core.telegram_manager import TgClient
 from bot.helper.ext_utils.bot_utils import new_task, sync_to_async
 from bot.helper.telegram_helper.message_utils import send_file, send_message
 

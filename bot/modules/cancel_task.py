@@ -1,7 +1,7 @@
 from asyncio import sleep
 
 from bot import multi_tags, task_dict, task_dict_lock, user_data
-from bot.core.aeon_client import Config
+from bot.core.telegram_manager import Config
 from bot.helper.ext_utils.bot_utils import new_task
 from bot.helper.ext_utils.status_utils import (
     MirrorStatus,

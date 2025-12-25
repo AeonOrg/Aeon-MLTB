@@ -1,7 +1,7 @@
 from speedtest import Speedtest
 
 from bot import LOGGER
-from bot.core.aeon_client import TgClient
+from bot.core.telegram_manager import TgClient
 from bot.helper.ext_utils.bot_utils import new_task
 from bot.helper.ext_utils.status_utils import get_readable_file_size
 from bot.helper.telegram_helper.message_utils import (

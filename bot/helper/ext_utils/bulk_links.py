@@ -2,25 +2,10 @@ from aiofiles import open as aiopen
 from aiofiles.os import remove
 
 
-def filter_links(links_list: list, bulk_start: int, bulk_end: int) -> list:
-    """
-    Filters a list of links based on start and end indices.
-
-    Args:
-        links_list: The list of links to filter.
-        bulk_start: The starting index (1-based). If 0, no start filtering.
-        bulk_end: The ending index. If 0, no end filtering.
-
-    Returns:
-        The filtered list of links.
-    """
-    if bulk_start != 0 and bulk_end != 0:
-        links_list = links_list[bulk_start:bulk_end]
-    elif bulk_start != 0:
-        links_list = links_list[bulk_start:]
-    elif bulk_end != 0:
-        links_list = links_list[:bulk_end]
-    return links_list
+def filter_links(links_list, bulk_start, bulk_end):
+    start = bulk_start if bulk_start > 0 else None
+    end = bulk_end if bulk_end > 0 else None
+    return links_list[start:end]
 
 
 def get_links_from_message(text: str) -> list:

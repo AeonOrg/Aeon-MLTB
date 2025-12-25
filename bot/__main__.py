@@ -14,7 +14,7 @@ from .core.startup import load_settings
 
 bot_loop.run_until_complete(load_settings())
 
-from .core.aeon_client import TgClient
+from .core.telegram_manager import TgClient
 from .helper.telegram_helper.bot_commands import BotCommands
 
 COMMANDS = {

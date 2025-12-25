@@ -130,6 +130,9 @@ async def take_ss(video_file, ss_nb) -> bool:
         for i in range(ss_nb):
             output = f"{dirpath}/SS.{name}_{i:02}.png"
             cmd = [
+                "taskset",
+                    "-c",
+                    f"{cores}",
                 "xtra",
                 "-hide_banner",
                 "-loglevel",
@@ -152,13 +155,13 @@ async def take_ss(video_file, ss_nb) -> bool:
             resutls = await wait_for(gather(*cmds), timeout=60)
             if resutls[0][2] != 0:
                 LOGGER.error(
-                    f"Error while creating sreenshots from video. Path: {video_file}. stderr: {resutls[0][1]}",
+                    f"Error while creating screenshots from video. Path: {video_file}. stderr: {resutls[0][1]}",
                 )
                 await rmtree(dirpath, ignore_errors=True)
                 return False
         except Exception:
             LOGGER.error(
-                f"Error while creating sreenshots from video. Path: {video_file}. Error: Timeout some issues with ffmpeg with specific arch!",
+                f"Error while creating screenshots from video. Path: {video_file}. Error: Timeout some issues with ffmpeg with specific arch!",
             )
             await rmtree(dirpath, ignore_errors=True)
             return False
@@ -172,6 +175,9 @@ async def get_audio_thumbnail(audio_file):
     await makedirs(output_dir, exist_ok=True)
     output = ospath.join(output_dir, f"{time()}.jpg")
     cmd = [
+        "taskset",
+                    "-c",
+                    f"{cores}",
         "xtra",
         "-hide_banner",
         "-loglevel",
@@ -211,6 +217,9 @@ async def get_video_thumbnail(video_file, duration):
         duration = 3
     duration = duration // 2
     cmd = [
+        "taskset",
+                    "-c",
+                    f"{cores}",
         "xtra",
         "-hide_banner",
         "-loglevel",
@@ -254,6 +263,9 @@ async def get_multiple_frames_thumbnail(video_file, layout, keep_screenshots):
     await makedirs(output_dir, exist_ok=True)
     output = ospath.join(output_dir, f"{time()}.jpg")
     cmd = [
+        "taskset",
+                    "-c",
+                    f"{cores}",
         "xtra",
         "-hide_banner",
         "-loglevel",
@@ -376,7 +388,7 @@ class FFMpeg:
                         except Exception:
                             self._progress_raw = 0
                             self._eta_raw = 0
-            await sleep(0.05)
+        
 
     async def ffmpeg_cmds(self, ffmpeg, f_path):
         self.clear()
@@ -471,6 +483,9 @@ class FFMpeg:
         output = f"{base_name}.{ext}"
         if retry:
             cmd = [
+                "taskset",
+                    "-c",
+                    f"{cores}",
                 "xtra",
                 "-hide_banner",
                 "-loglevel",
@@ -497,6 +512,9 @@ class FFMpeg:
                 cmd[14:14] = ["-c:s", "copy"]
         else:
             cmd = [
+                "taskset",
+                    "-c",
+                    f"{cores}",
                 "xtra",
                 "-hide_banner",
                 "-loglevel",
@@ -549,6 +567,9 @@ class FFMpeg:
         base_name = ospath.splitext(audio_file)[0]
         output = f"{base_name}.{ext}"
         cmd = [
+            "taskset",
+                    "-c",
+                    f"{cores}",
             "xtra",
             "-hide_banner",
             "-loglevel",
@@ -620,6 +641,9 @@ class FFMpeg:
         filter_complex += f"concat=n={len(segments)}:v=1:a=1[vout][aout]"
 
         cmd = [
+            "taskset",
+                    "-c",
+                    f"{cores}",
             "xtra",
             "-hide_banner",
             "-loglevel",
@@ -682,6 +706,9 @@ class FFMpeg:
         while i <= parts or start_time < duration - 4:
             out_path = f_path.replace(file_, f"{base_name}.part{i:03}{extension}")
             cmd = [
+                "taskset",
+                    "-c",
+                    f"{cores}",
                 "xtra",
                 "-hide_banner",
                 "-loglevel",
@@ -759,7 +786,7 @@ class FFMpeg:
                 break
             if duration == lpd:
                 LOGGER.warning(
-                    f"This file has been splitted with default stream and audio, so you will only see one part with less size from orginal one because it doesn't have all streams and audios. This happens mostly with MKV videos. Path: {f_path}",
+                    f"This file has been splitted with default stream and audio, so you will only see one part with less size from original one because it doesn't have all streams and audios. This happens mostly with MKV videos. Path: {f_path}",
                 )
                 break
             if lpd <= 3:

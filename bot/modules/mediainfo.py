@@ -10,7 +10,7 @@ from aiofiles.os import path as aiopath
 from aiofiles.os import remove as aioremove
 
 from bot import LOGGER
-from bot.core.aeon_client import TgClient
+from bot.core.telegram_manager import TgClient
 from bot.helper.aeon_utils.access_check import token_check
 from bot.helper.ext_utils.bot_utils import cmd_exec
 from bot.helper.ext_utils.telegraph_helper import telegraph

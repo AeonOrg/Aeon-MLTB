@@ -20,7 +20,7 @@ from bot import (
     task_dict_lock,
     user_data,
 )
-from bot.core.aeon_client import TgClient
+from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
 from bot.helper.ext_utils.bot_utils import SetInterval
 from bot.helper.ext_utils.exceptions import TgLinkException

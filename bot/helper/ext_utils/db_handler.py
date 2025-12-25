@@ -7,7 +7,7 @@ from pymongo.errors import PyMongoError
 from pymongo.server_api import ServerApi
 
 from bot import LOGGER, qbit_options, rss_dict, user_data
-from bot.core.aeon_client import TgClient
+from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
 
 
@@ -28,6 +28,8 @@ class DbManager:
             self._conn = AsyncMongoClient(
                 Config.DATABASE_URL,
                 server_api=ServerApi("1"),
+                connectTimeoutMS=60000,
+                serverSelectionTimeoutMS=60000,
             )
             self.db = self._conn.luna
             self._return = False

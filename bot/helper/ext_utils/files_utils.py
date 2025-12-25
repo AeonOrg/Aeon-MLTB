@@ -317,7 +317,9 @@ class SevenZ:
         return self._percentage
 
     async def _sevenz_progress(self):
-        pattern = r"(\d+)\s+bytes|Total Physical Size\s*=\s*(\d+)"
+        pattern = (
+            r"(\d+)\s+bytes|Total Physical Size\s*=\s*(\d+)|Physical Size\s*=\s*(\d+)"
+        )
         while not (
             self._listener.subproc.returncode is not None
             or self._listener.is_cancelled
@@ -330,7 +332,6 @@ class SevenZ:
             line = line.decode().strip()
             if match := re_search(pattern, line):
                 self._listener.subsize = int(match[1] or match[2])
-            await sleep(0.05)
         s = b""
         while not (
             self._listener.is_cancelled
@@ -354,7 +355,7 @@ class SevenZ:
                     self._processed_bytes = 0
                     self._percentage = "0%"
                 s = b""
-            await sleep(0.05)
+            
 
         self._processed_bytes = 0
         self._percentage = "0%"
