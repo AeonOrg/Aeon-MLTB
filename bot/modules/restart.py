@@ -8,9 +8,9 @@ from aiofiles.os import path as aiopath
 from aiofiles.os import remove
 
 from bot import LOGGER, intervals, sabnzbd_client, scheduler
-from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
 from bot.core.jdownloader_booter import jdownloader
+from bot.core.telegram_manager import TgClient
 from bot.core.torrent_manager import TorrentManager
 from bot.helper.ext_utils.bot_utils import new_task
 from bot.helper.ext_utils.db_handler import database

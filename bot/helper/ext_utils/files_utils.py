@@ -1,4 +1,4 @@
-from asyncio import create_subprocess_exec, sleep, wait_for
+from asyncio import create_subprocess_exec, wait_for
 from asyncio.subprocess import PIPE
 from os import path as ospath
 from os import readlink, walk
@@ -317,9 +317,7 @@ class SevenZ:
         return self._percentage
 
     async def _sevenz_progress(self):
-        pattern = (
-            r"(\d+)\s+bytes|Total Physical Size\s*=\s*(\d+)|Physical Size\s*=\s*(\d+)"
-        )
+        pattern = r"(\d+)\s+bytes|Total Physical Size\s*=\s*(\d+)|Physical Size\s*=\s*(\d+)"
         while not (
             self._listener.subproc.returncode is not None
             or self._listener.is_cancelled
@@ -355,7 +353,6 @@ class SevenZ:
                     self._processed_bytes = 0
                     self._percentage = "0%"
                 s = b""
-            
 
         self._processed_bytes = 0
         self._percentage = "0%"

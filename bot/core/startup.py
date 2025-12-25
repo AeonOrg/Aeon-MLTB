@@ -1,4 +1,4 @@
-from asyncio import create_subprocess_exec, create_subprocess_shell, sleep 
+from asyncio import create_subprocess_exec, create_subprocess_shell, sleep
 from os import environ
 
 import aiohttp
@@ -25,8 +25,8 @@ from bot import (
 )
 from bot.helper.ext_utils.db_handler import database
 
-from .telegram_manager import TgClient
 from .config_manager import Config
+from .telegram_manager import TgClient
 from .torrent_manager import TorrentManager
 
 

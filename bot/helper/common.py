@@ -17,17 +17,17 @@ from pyrogram.enums import ChatAction
 from bot import (
     DOWNLOAD_DIR,
     LOGGER,
+    cores,
     cpu_eater_lock,
     excluded_extensions,
     intervals,
     multi_tags,
     task_dict,
-    cores,
     task_dict_lock,
     user_data,
 )
-from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
+from bot.core.telegram_manager import TgClient
 from bot.helper.aeon_utils.command_gen import (
     get_embed_thumb_cmd,
     get_metadata_cmd,
@@ -269,7 +269,8 @@ class TaskConfig:
             if self.up_dest in self.user_dict["UPLOAD_PATHS"]:
                 self.up_dest = self.user_dict["UPLOAD_PATHS"][self.up_dest]
         elif (
-            "UPLOAD_PATHS" not in self.user_dict or not self.user_dict["UPLOAD_PATHS"]
+            "UPLOAD_PATHS" not in self.user_dict
+            or not self.user_dict["UPLOAD_PATHS"]
         ) and Config.UPLOAD_PATHS:
             if self.up_dest in Config.UPLOAD_PATHS:
                 self.up_dest = Config.UPLOAD_PATHS[self.up_dest]
@@ -278,7 +279,8 @@ class TaskConfig:
             if self.user_dict.get("FFMPEG_CMDS", None):
                 ffmpeg_dict = deepcopy(self.user_dict["FFMPEG_CMDS"])
             elif (
-                "FFMPEG_CMDS" not in self.user_dict or not self.user_dict["FFMPEG_CMDS"]
+                "FFMPEG_CMDS" not in self.user_dict
+                or not self.user_dict["FFMPEG_CMDS"]
             ) and Config.FFMPEG_CMDS:
                 ffmpeg_dict = deepcopy(Config.FFMPEG_CMDS)
             else:
@@ -287,21 +289,20 @@ class TaskConfig:
             for key in list(self.ffmpeg_cmds):
                 if isinstance(key, tuple):
                     cmds.extend(list(key))
-                elif ffmpeg_dict is not None:
-                    if key in ffmpeg_dict.keys():
-                        for ind, vl in enumerate(ffmpeg_dict[key]):
-                            if variables := set(findall(r"\{(.*?)\}", vl)):
-                                ff_values = (
-                                    self.user_dict.get("FFMPEG_VARIABLES", {})
-                                    .get(key, {})
-                                    .get(str(ind), {})
-                                )
-                                if Counter(list(variables)) == Counter(
-                                    list(ff_values.keys())
-                                ):
-                                    cmds.append(vl.format(**ff_values))
-                            else:
-                                cmds.append(vl)
+                elif ffmpeg_dict is not None and key in ffmpeg_dict:
+                    for ind, vl in enumerate(ffmpeg_dict[key]):
+                        if variables := set(findall(r"\{(.*?)\}", vl)):
+                            ff_values = (
+                                self.user_dict.get("FFMPEG_VARIABLES", {})
+                                .get(key, {})
+                                .get(str(ind), {})
+                            )
+                            if Counter(list(variables)) == Counter(
+                                list(ff_values.keys())
+                            ):
+                                cmds.append(vl.format(**ff_values))
+                        else:
+                            cmds.append(vl)
             self.ffmpeg_cmds = cmds
         if not self.is_leech:
             self.stop_duplicate = self.user_dict.get("STOP_DUPLICATE") or (
@@ -627,7 +628,9 @@ class TaskConfig:
                 self.tag = " ".join(user_info[:-1])
             else:
                 self.tag, id_ = text[1].split("Tag: ")[1].split()
-            self.user = self.message.from_user = await self.client.get_users(int(id_))
+            self.user = self.message.from_user = await self.client.get_users(
+                int(id_)
+            )
             self.user_id = self.user.id
             self.user_dict = user_data.get(self.user_id, {})
             with contextlib.suppress(Exception):
@@ -956,7 +959,9 @@ class TaskConfig:
                                 if cmd[index + 1].startswith("mltb"):
                                     var_cmd[index + 1] = f_path
                                 elif is_telegram_link(cmd[index + 1]):
-                                    msg = (await get_tg_link_message(cmd[index + 1]))[0]
+                                    msg = (
+                                        await get_tg_link_message(cmd[index + 1])
+                                    )[0]
                                     file_dir = await temp_download(msg)
                                     inputs[index + 1] = file_dir
                                     var_cmd[index + 1] = file_dir

@@ -30,8 +30,8 @@ from tenacity import (
     wait_exponential,
 )
 
-from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
+from bot.core.telegram_manager import TgClient
 from bot.helper.aeon_utils.caption_gen import generate_caption
 from bot.helper.ext_utils.bot_utils import sync_to_async
 from bot.helper.ext_utils.files_utils import (

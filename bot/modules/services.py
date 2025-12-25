@@ -5,8 +5,8 @@ from uuid import uuid4
 from aiofiles import open as aiopen
 
 from bot import LOGGER, user_data
-from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
+from bot.core.telegram_manager import TgClient
 from bot.helper.ext_utils.bot_utils import new_task
 from bot.helper.ext_utils.db_handler import database
 from bot.helper.ext_utils.status_utils import get_readable_time

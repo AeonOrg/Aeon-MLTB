@@ -1,5 +1,5 @@
 import contextlib
-from asyncio import create_subprocess_exec, gather, sleep, wait_for
+from asyncio import create_subprocess_exec, gather, wait_for
 from asyncio.subprocess import PIPE
 from os import path as ospath
 from re import escape
@@ -131,8 +131,8 @@ async def take_ss(video_file, ss_nb) -> bool:
             output = f"{dirpath}/SS.{name}_{i:02}.png"
             cmd = [
                 "taskset",
-                    "-c",
-                    f"{cores}",
+                "-c",
+                f"{cores}",
                 "xtra",
                 "-hide_banner",
                 "-loglevel",
@@ -176,8 +176,8 @@ async def get_audio_thumbnail(audio_file):
     output = ospath.join(output_dir, f"{time()}.jpg")
     cmd = [
         "taskset",
-                    "-c",
-                    f"{cores}",
+        "-c",
+        f"{cores}",
         "xtra",
         "-hide_banner",
         "-loglevel",
@@ -218,8 +218,8 @@ async def get_video_thumbnail(video_file, duration):
     duration = duration // 2
     cmd = [
         "taskset",
-                    "-c",
-                    f"{cores}",
+        "-c",
+        f"{cores}",
         "xtra",
         "-hide_banner",
         "-loglevel",
@@ -264,8 +264,8 @@ async def get_multiple_frames_thumbnail(video_file, layout, keep_screenshots):
     output = ospath.join(output_dir, f"{time()}.jpg")
     cmd = [
         "taskset",
-                    "-c",
-                    f"{cores}",
+        "-c",
+        f"{cores}",
         "xtra",
         "-hide_banner",
         "-loglevel",
@@ -388,7 +388,6 @@ class FFMpeg:
                         except Exception:
                             self._progress_raw = 0
                             self._eta_raw = 0
-        
 
     async def ffmpeg_cmds(self, ffmpeg, f_path):
         self.clear()
@@ -484,8 +483,8 @@ class FFMpeg:
         if retry:
             cmd = [
                 "taskset",
-                    "-c",
-                    f"{cores}",
+                "-c",
+                f"{cores}",
                 "xtra",
                 "-hide_banner",
                 "-loglevel",
@@ -513,8 +512,8 @@ class FFMpeg:
         else:
             cmd = [
                 "taskset",
-                    "-c",
-                    f"{cores}",
+                "-c",
+                f"{cores}",
                 "xtra",
                 "-hide_banner",
                 "-loglevel",
@@ -568,8 +567,8 @@ class FFMpeg:
         output = f"{base_name}.{ext}"
         cmd = [
             "taskset",
-                    "-c",
-                    f"{cores}",
+            "-c",
+            f"{cores}",
             "xtra",
             "-hide_banner",
             "-loglevel",
@@ -642,8 +641,8 @@ class FFMpeg:
 
         cmd = [
             "taskset",
-                    "-c",
-                    f"{cores}",
+            "-c",
+            f"{cores}",
             "xtra",
             "-hide_banner",
             "-loglevel",
@@ -707,8 +706,8 @@ class FFMpeg:
             out_path = f_path.replace(file_, f"{base_name}.part{i:03}{extension}")
             cmd = [
                 "taskset",
-                    "-c",
-                    f"{cores}",
+                "-c",
+                f"{cores}",
                 "xtra",
                 "-hide_banner",
                 "-loglevel",

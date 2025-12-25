@@ -30,10 +30,10 @@ from bot import (
     sudo_users,
     task_dict,
 )
-from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
 from bot.core.jdownloader_booter import jdownloader
 from bot.core.startup import update_nzb_options, update_variables
+from bot.core.telegram_manager import TgClient
 from bot.core.torrent_manager import TorrentManager
 from bot.helper.ext_utils.bot_utils import SetInterval, new_task
 from bot.helper.ext_utils.db_handler import database

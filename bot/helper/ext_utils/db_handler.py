@@ -7,8 +7,8 @@ from pymongo.errors import PyMongoError
 from pymongo.server_api import ServerApi
 
 from bot import LOGGER, qbit_options, rss_dict, user_data
-from bot.core.telegram_manager import TgClient
 from bot.core.config_manager import Config
+from bot.core.telegram_manager import TgClient
 
 
 class DbManager:
