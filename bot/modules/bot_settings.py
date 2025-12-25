@@ -225,7 +225,7 @@ async def edit_variable(_, message, pre_message, key):
         if drives_names and drives_names[0] == "Main":
             index_urls[0] = value
         else:
-            index_urls.insert(0, value.)
+            index_urls.insert(0, value)
     elif key == "AUTHORIZED_CHATS":
         aid = value.split()
         auth_chats.clear()
