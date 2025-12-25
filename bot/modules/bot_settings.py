@@ -400,7 +400,7 @@ async def update_private_file(_, message, pre_message):
                     drives_ids.append(temp[1])
                     drives_names.append(temp[0].replace("_", " "))
                     if len(temp) > 2:
-                        index_urls.append(temp[2]).
+                        index_urls.append(temp[2])
                     else:
                         index_urls.append("")
         elif file_name in [".netrc", "netrc"]:
