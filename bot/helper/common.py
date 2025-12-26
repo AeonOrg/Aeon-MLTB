@@ -456,33 +456,31 @@ class TaskConfig:
                         )
                         self.user_transmission = False
                         self.hybrid_leech = False
-                    else:
-                        uploader_id = TgClient.user.me.id
-                        if chat.type.name not in [
-                            "SUPERGROUP",
-                            "CHANNEL",
-                            "GROUP",
-                            "FORUM",
-                        ]:
+                    elif chat.type.name not in [
+                        "SUPERGROUP",
+                        "CHANNEL",
+                        "GROUP",
+                        "FORUM",
+                    ]:
+                        self.user_transmission = False
+                        self.hybrid_leech = False
+                    elif chat.is_admin:
+                        member = await chat.get_member(TgClient.user.me.id)
+                        if (
+                            not member.privileges.can_manage_chat
+                            or not member.privileges.can_delete_messages
+                        ):
                             self.user_transmission = False
                             self.hybrid_leech = False
-                        elif chat.is_admin:
-                            member = await chat.get_member(TgClient.user.me.id)
-                            if (
-                                not member.privileges.can_manage_chat
-                                or not member.privileges.can_delete_messages
-                            ):
-                                self.user_transmission = False
-                                self.hybrid_leech = False
-                                LOGGER.warning(
+                            LOGGER.warning(
                                 "Enable manage chat and delete messages to account of the user session from administration settings!"
                             )
-                        else:
-                            LOGGER.warning(
-                                "Promote the account of the user session to admin in the chat to get the benefit of user transmission!"
-                            )
-                            self.user_transmission = False
-                            self.hybrid_leech = False
+                    else:
+                        LOGGER.warning(
+                            "Promote the account of the user session to admin in the chat to get the benefit of user transmission!"
+                        )
+                        self.user_transmission = False
+                        self.hybrid_leech = False
 
                 if not self.user_transmission or self.hybrid_leech:
                     try:
@@ -494,39 +492,36 @@ class TaskConfig:
                             self.hybrid_leech = False
                         else:
                             raise ValueError("Chat not found!")
+                    elif chat.type.name in [
+                        "SUPERGROUP",
+                        "CHANNEL",
+                        "GROUP",
+                        "FORUM",
+                    ]:
+                        if not chat.is_admin:
+                            raise ValueError(
+                                "Bot is not admin in the destination chat!"
+                            )
+                        member = await chat.get_member(self.client.me.id)
+                        if (
+                            not member.privileges.can_manage_chat
+                            or not member.privileges.can_delete_messages
+                        ):
+                            if not self.user_transmission:
+                                raise ValueError(
+                                    "You don't have enough privileges in this chat! Enable manage chat and delete messages for this bot!"
+                                )
+                            self.hybrid_leech = False
                     else:
-                        if chat.type.name in [
-                            "SUPERGROUP",
-                            "CHANNEL",
-                            "GROUP",
-                            "FORUM",
-                        ]:
-                            if not chat.is_admin:
-                                raise ValueError(
-                                    "Bot is not admin in the destination chat!"
-                                )
-                            else:
-                                member = await chat.get_member(self.client.me.id)
-                                if (
-                                    not member.privileges.can_manage_chat
-                                    or not member.privileges.can_delete_messages
-                                ):
-                                    if not self.user_transmission:
-                                        raise ValueError(
-                                            "You don't have enough privileges in this chat! Enable manage chat and delete messages for this bot!"
-                                        )
-                                    else:
-                                        self.hybrid_leech = False
-                        else:
-                            try:
-                                await self.client.send_chat_action(
-                                    self.up_dest,
-                                    ChatAction.TYPING,
-                                )
-                            except Exception:
-                                raise ValueError(
-                                    "Start the bot and try again!",
-                                ) from None
+                        try:
+                            await self.client.send_chat_action(
+                                self.up_dest,
+                                ChatAction.TYPING,
+                            )
+                        except Exception:
+                            raise ValueError(
+                                "Start the bot and try again!",
+                            ) from None
             elif (
                 self.user_transmission or self.hybrid_leech
             ) and not self.is_super_chat:

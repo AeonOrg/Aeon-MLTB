@@ -2,7 +2,7 @@ import contextlib
 from logging import getLogger
 from os import listdir, remove
 from os import path as ospath
-from .... import intervals
+
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from tenacity import (
@@ -13,6 +13,7 @@ from tenacity import (
     wait_exponential,
 )
 
+from bot import intervals
 from bot.core.config_manager import Config
 from bot.helper.ext_utils.bot_utils import SetInterval, async_to_sync
 from bot.helper.ext_utils.files_utils import get_mime_type
@@ -121,7 +122,7 @@ class GoogleDriveUpload(GoogleDriveHelper):
             current_file_name = ospath.join(input_directory, item)
             if not ospath.exists(current_file_name):
                 if intervals["stopAll"]:
-                    return
+                    return None
                 LOGGER.error(f"{current_file_name} not exists! Continue uploading!")
                 continue
             if ospath.isdir(current_file_name):

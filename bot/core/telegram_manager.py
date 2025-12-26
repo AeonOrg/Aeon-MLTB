@@ -2,6 +2,7 @@ from asyncio import Lock
 
 from pyrogram import Client, enums
 from pyrogram.types import LinkPreviewOptions
+
 from bot import LOGGER
 
 from .config_manager import Config

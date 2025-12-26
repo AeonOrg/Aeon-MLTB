@@ -344,7 +344,9 @@ class SevenZ:
                 perc = line.split("%", 1)[0]
                 if perc.isdigit():
                     self._percentage = f"{perc}%"
-                    self._processed_bytes = (int(perc) / 100) * self._listener.subsize
+                    self._processed_bytes = (
+                        int(perc) / 100
+                    ) * self._listener.subsize
                 else:
                     self._percentage = "0%"
                 continue

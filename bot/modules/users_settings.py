@@ -341,9 +341,9 @@ Add to Playlist ID: <code>{yt_add_to_playlist_id}</code>"""
             inc_ex = included_extensions
         else:
             inc_ex = "None"
-        if user_dict.get("NAME_SUBSTITUTE", False):
-            ns_msg = "Added"
-        elif "NAME_SUBSTITUTE" not in user_dict and Config.NAME_SUBSTITUTE:
+        if user_dict.get("NAME_SUBSTITUTE", False) or (
+            "NAME_SUBSTITUTE" not in user_dict and Config.NAME_SUBSTITUTE
+        ):
             ns_msg = "Added"
         else:
             ns_msg = "None"
