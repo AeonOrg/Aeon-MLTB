@@ -1,16 +1,21 @@
+import builtins
+import contextlib
 from logging import getLogger
-from os import path as ospath, listdir
+from os import listdir
+from os import path as ospath
 from re import search as re_search
-from secrets import token_urlsafe
-from yt_dlp import YoutubeDL, DownloadError
 
+from yt_dlp import DownloadError, YoutubeDL
 
-from .... import task_dict_lock, task_dict
-from ...ext_utils.bot_utils import sync_to_async, async_to_sync
-from ...ext_utils.task_manager import check_running_tasks, stop_duplicate_check
-from ...mirror_leech_utils.status_utils.queue_status import QueueStatus
-from ...telegram_helper.message_utils import send_status_message
-from ..status_utils.yt_dlp_status import YtDlpStatus
+from bot import task_dict, task_dict_lock
+from bot.helper.ext_utils.bot_utils import async_to_sync, sync_to_async
+from bot.helper.ext_utils.task_manager import (
+    check_running_tasks,
+    stop_duplicate_check,
+)
+from bot.helper.mirror_leech_utils.status_utils.queue_status import QueueStatus
+from bot.helper.mirror_leech_utils.status_utils.yt_dlp_status import YtDlpStatus
+from bot.helper.telegram_helper.message_utils import send_status_message
 
 LOGGER = getLogger(__name__)
 
@@ -22,14 +27,14 @@ class MyLogger:
 
     def debug(self, msg):
         # Hack to fix changing extension
-        if not self._obj.is_playlist:
-            if match := re_search(
-                r".Merger..Merging formats into..(.*?).$", msg
-            ) or re_search(r".ExtractAudio..Destination..(.*?)$", msg):
-                LOGGER.info(msg)
-                newname = match.group(1)
-                newname = newname.rsplit("/", 1)[-1]
-                self._listener.name = newname
+        if not self._obj.is_playlist and (
+            match := re_search(r".Merger..Merging formats into..(.*?).$", msg)
+            or re_search(r".ExtractAudio..Destination..(.*?)$", msg)
+        ):
+            LOGGER.info(msg)
+            newname = match.group(1)
+            newname = newname.rsplit("/", 1)[-1]
+            self._listener.name = newname
 
     @staticmethod
     def warning(msg):
@@ -116,14 +121,14 @@ class YoutubeDLHelper:
                     self._listener.size = d["total_bytes_estimate"] or 0
                 self._downloaded_bytes = d["downloaded_bytes"] or 0
                 self._eta = d.get("eta", "-") or "-"
-            try:
+            with contextlib.suppress(builtins.BaseException):
                 self._progress = (self._downloaded_bytes / self._listener.size) * 100
-            except:
-                pass
 
     async def _on_download_start(self, from_queue=False):
         async with task_dict_lock:
-            task_dict[self._listener.mid] = YtDlpStatus(self._listener, self, self._gid)
+            task_dict[self._listener.mid] = YtDlpStatus(
+                self._listener, self, self._gid
+            )
         if not from_queue:
             await self._listener.on_download_start()
             if self._listener.multi <= 1:
@@ -147,7 +152,7 @@ class YoutubeDLHelper:
                 for entry in result["entries"]:
                     if not entry:
                         continue
-                    elif "filesize_approx" in entry:
+                    if "filesize_approx" in entry:
                         self._listener.size += entry.get("filesize_approx", 0) or 0
                     elif "filesize" in entry:
                         self._listener.size += entry.get("filesize", 0) or 0
@@ -163,10 +168,13 @@ class YoutubeDLHelper:
                 realName = ydl.prepare_filename(result, outtmpl=outtmpl_)
                 ext = ospath.splitext(realName)[-1]
                 self._listener.name = (
-                    f"{self._listener.name}{ext}" if self._listener.name else realName
+                    f"{self._listener.name}{ext}"
+                    if self._listener.name
+                    else realName
                 )
                 if not self._ext:
                     self._ext = ext
+        return None
 
     def _download(self, path):
         try:

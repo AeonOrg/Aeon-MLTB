@@ -289,7 +289,7 @@ Add to Playlist ID: <code>{yt_add_to_playlist_id}</code>"""
             and Config.UPLOAD_PATHS
         ):
             upload_paths = Config.UPLOAD_PATHS
-        if not upload_paths: 
+        if not upload_paths:
             upload_paths = "None"
 
         buttons.data_button("Upload Paths", f"userset {user_id} menu UPLOAD_PATHS")

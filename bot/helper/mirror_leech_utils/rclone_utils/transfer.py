@@ -33,7 +33,6 @@ class RcloneTransferHelper:
         self._sa_index = 0
         self._sa_number = 0
         self._use_service_accounts = Config.USE_SERVICE_ACCOUNTS
-        
 
     @property
     def transferred_size(self):

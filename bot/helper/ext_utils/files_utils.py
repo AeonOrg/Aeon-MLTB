@@ -243,6 +243,7 @@ async def remove_excluded_files(fpath, ee):
             if f.strip().lower().endswith(tuple(ee)):
                 await remove(ospath.join(root, f))
 
+
 async def remove_non_included_files(fpath, ie):
     for root, _, files in await sync_to_async(walk, fpath):
         if root.strip().endswith("/yt-dlp-thumb"):
@@ -251,6 +252,7 @@ async def remove_non_included_files(fpath, ie):
             if f.strip().lower().endswith(tuple(ie)):
                 continue
             await remove(ospath.join(root, f))
+
 
 async def join_files(opath):
     files = await listdir(opath)

@@ -120,13 +120,19 @@ class GoogleDriveClone(GoogleDriveHelper):
                 file_path = ospath.join(folder_name, file.get("name"))
                 current_dir_id = self.create_directory(file.get("name"), dest_id)
                 self._clone_folder(file_path, file.get("id"), current_dir_id)
-            elif self.listener.included_extensions and not file.get(
-                "name"
-            ).strip().lower().endswith(tuple(self.listener.included_extensions)):
-                continue
-            elif not self.listener.included_extensions and file.get(
-                "name"
-            ).strip().lower().endswith(tuple(self.listener.excluded_extensions)):
+            elif (
+                self.listener.included_extensions
+                and not file.get("name")
+                .strip()
+                .lower()
+                .endswith(tuple(self.listener.included_extensions))
+            ) or (
+                not self.listener.included_extensions
+                and file.get("name")
+                .strip()
+                .lower()
+                .endswith(tuple(self.listener.excluded_extensions))
+            ):
                 continue
             else:
                 self.total_files += 1

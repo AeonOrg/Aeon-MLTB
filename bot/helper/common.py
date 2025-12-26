@@ -230,7 +230,9 @@ class TaskConfig:
             else ["aria2", "!qB"]
         )
         self.included_extensions = self.user_dict.get("INCLUDED_EXTENSIONS") or (
-            included_extensions if "INCLUDED_EXTENSIONS" not in self.user_dict else []
+            included_extensions
+            if "INCLUDED_EXTENSIONS" not in self.user_dict
+            else []
         )
         if not self.rc_flags:
             if self.user_dict.get("RCLONE_FLAGS"):
@@ -274,11 +276,14 @@ class TaskConfig:
             if self.up_dest in self.user_dict["UPLOAD_PATHS"]:
                 self.up_dest = self.user_dict["UPLOAD_PATHS"][self.up_dest]
         elif (
-            "UPLOAD_PATHS" not in self.user_dict
-            or not self.user_dict["UPLOAD_PATHS"]
-        ) and Config.UPLOAD_PATHS:
-            if self.up_dest in Config.UPLOAD_PATHS:
-                self.up_dest = Config.UPLOAD_PATHS[self.up_dest]
+            (
+                "UPLOAD_PATHS" not in self.user_dict
+                or not self.user_dict["UPLOAD_PATHS"]
+            )
+            and Config.UPLOAD_PATHS
+            and self.up_dest in Config.UPLOAD_PATHS
+        ):
+            self.up_dest = Config.UPLOAD_PATHS[self.up_dest]
 
         if self.ffmpeg_cmds:
             if self.user_dict.get("FFMPEG_CMDS", None):

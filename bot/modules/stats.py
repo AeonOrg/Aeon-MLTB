@@ -43,7 +43,9 @@ async def bot_stats(_, message):
     swap = swap_memory()
     memory = virtual_memory()
     per_cpu = cpu_percent(interval=1, percpu=True)
-    per_cpu_str = " | ".join([f"CPU{i+1}: {round(p)}%" for i, p in enumerate(per_cpu)])
+    per_cpu_str = " | ".join(
+        [f"CPU{i + 1}: {round(p)}%" for i, p in enumerate(per_cpu)]
+    )
     stats = f"""
 <b>Commit Date:</b> {commands["commit"]}
 
