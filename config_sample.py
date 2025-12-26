@@ -21,6 +21,7 @@ STREAMWISH_API = ""
 EXCLUDED_EXTENSIONS = (
     ""  # Space separated file extensions to exclude (e.g., .log .exe)
 )
+INCLUDED_EXTENSIONS = ""
 INCOMPLETE_TASK_NOTIFIER = (
     False  # Notify for incomplete tasks on restart (requires DATABASE_URL)
 )

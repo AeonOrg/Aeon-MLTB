@@ -289,7 +289,7 @@ Add to Playlist ID: <code>{yt_add_to_playlist_id}</code>"""
             and Config.UPLOAD_PATHS
         ):
             upload_paths = Config.UPLOAD_PATHS
-        else:
+        if not upload_paths: 
             upload_paths = "None"
 
         buttons.data_button("Upload Paths", f"userset {user_id} menu UPLOAD_PATHS")
@@ -332,6 +332,15 @@ Add to Playlist ID: <code>{yt_add_to_playlist_id}</code>"""
         else:
             ex_ex = "None"
 
+        buttons.data_button(
+            "Included Extensions", f"userset {user_id} menu INCLUDED_EXTENSIONS"
+        )
+        if user_dict.get("INCLUDED_EXTENSIONS", False):
+            inc_ex = user_dict["INCLUDED_EXTENSIONS"]
+        elif "INCLUDED_EXTENSIONS" not in user_dict:
+            inc_ex = included_extensions
+        else:
+            inc_ex = "None"
         ns_msg = "Added" if user_dict.get("NAME_SUBSTITUTE", False) else "None"
         buttons.data_button(
             "Name Substitute",
@@ -392,6 +401,7 @@ Upload Paths is <code>{upload_paths}</code>
 Name substitution is <code>{ns_msg}</code>
 Name prefix is <code>{np_msg}</code>
 Excluded Extensions is <code>{ex_ex}</code>
+Included Extensions is <code>{inc_ex}</code>
 YT-DLP Options is <code>{ytopt}</code>
 FFMPEG Commands is <code>{ffc}</code>
 Metadata is <code>{mdt}</code>
@@ -483,6 +493,12 @@ async def set_option(_, message, option):
     elif option == "EXCLUDED_EXTENSIONS":
         fx = value.split()
         value = ["aria2", "!qB"]
+        for x in fx:
+            x = x.lstrip(".")
+            value.append(x.strip().lower())
+    elif option == "INCLUDED_EXTENSIONS":
+        fx = value.split()
+        value = []
         for x in fx:
             x = x.lstrip(".")
             value.append(x.strip().lower())

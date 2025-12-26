@@ -14,6 +14,7 @@ from bot import (
     drives_ids,
     drives_names,
     excluded_extensions,
+    included_extensions,
     index_urls,
     nzb_options,
     qbit_options,
@@ -269,6 +270,11 @@ async def update_variables():
             x = x.lstrip(".")
             excluded_extensions.append(x.strip().lower())
 
+    if Config.INCLUDED_EXTENSIONS:
+        fx = Config.INCLUDED_EXTENSIONS.split()
+        for x in fx:
+            x = x.lstrip(".")
+            included_extensions.append(x.strip().lower())
     if Config.GDRIVE_ID:
         drives_names.append("Main")
         drives_ids.append(Config.GDRIVE_ID)

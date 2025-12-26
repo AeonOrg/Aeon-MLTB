@@ -18,6 +18,7 @@ class Config:
     DATABASE_URL: str = ""
     DEFAULT_UPLOAD: str = "gd"
     EXCLUDED_EXTENSIONS: str = ""
+    INCLUDED_EXTENSIONS: str = ""
     FFMPEG_CMDS: ClassVar[dict[str, list[str]]] = {}
     FILELION_API: str = ""
     GDRIVE_ID: str = ""

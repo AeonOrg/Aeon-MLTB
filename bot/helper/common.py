@@ -20,6 +20,7 @@ from bot import (
     cores,
     cpu_eater_lock,
     excluded_extensions,
+    included_extensions,
     intervals,
     multi_tags,
     task_dict,
@@ -137,6 +138,7 @@ class TaskConfig:
         self.subproc = None
         self.thumb = None
         self.excluded_extensions = []
+        self.included_extensions = []
         self.files_to_proceed = []
         self.is_super_chat = self.message.chat.type.name in [
             "SUPERGROUP",
@@ -226,6 +228,9 @@ class TaskConfig:
             excluded_extensions
             if "EXCLUDED_EXTENSIONS" not in self.user_dict
             else ["aria2", "!qB"]
+        )
+        self.included_extensions = self.user_dict.get("INCLUDED_EXTENSIONS") or (
+            included_extensions if "INCLUDED_EXTENSIONS" not in self.user_dict else []
         )
         if not self.rc_flags:
             if self.user_dict.get("RCLONE_FLAGS"):

@@ -96,6 +96,7 @@ nzb_jobs = {}
 rss_dict = {}
 auth_chats = {}
 excluded_extensions = ["aria2", "!qB"]
+included_extensions = []
 drives_names = []
 drives_ids = []
 index_urls = []

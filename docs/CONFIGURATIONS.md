@@ -19,6 +19,7 @@
 | `SUDO_USERS`              | `str`          | User IDs with sudo permission. Separate by spaces. |
 | `UPLOAD_PATHS`            | `dict`         | Dict with upload paths. Example: `{"path 1": "remote:", "path 2": "gdrive id", ...}` |
 | `DEFAULT_UPLOAD`          | `str`          | `rc` for `RCLONE_PATH`, `gd` for `GDRIVE_ID`. Default: `rc`. [Read More](https://github.com/anasty17/mirror-leech-telegram-bot/tree/master#upload). |
+| `INCLUDED_EXTENSIONS`     | `str`          | File extensions to be uploaded/cloned. `EXCLUDED_EXTENSIONS` will be ignore if you filled this ! Separate them by spaces. |
 | `EXCLUDED_EXTENSIONS`     | `str`          | File extensions to skip during processing. Separate by spaces. |
 | `INCOMPLETE_TASK_NOTIFIER`| `bool`         | Notify after restart for incomplete tasks. Requires `DATABASE_URL` and the bot to be in a supergroup. Default: `False`. |
 | `FILELION_API`            | `str`          | API key from [FileLion](https://vidhide.com/?op=my_account). |
