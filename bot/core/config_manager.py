@@ -35,7 +35,7 @@ class Config:
     HYBRID_LEECH: bool = False
     HYDRA_IP: str = ""
     HYDRA_API_KEY: str = ""
-    NAME_SUBSTITUTE: str = ""
+    NAME_SUBSTITUTE: str = r""
     OWNER_ID: int = 0
     QUEUE_ALL: int = 0
     QUEUE_DOWNLOAD: int = 0

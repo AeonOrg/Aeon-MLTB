@@ -1,36 +1,35 @@
+from httpx import AsyncClient
+from apscheduler.triggers.interval import IntervalTrigger
 from asyncio import Lock, sleep
 from datetime import datetime, timedelta
+from feedparser import parse as feed_parse
 from functools import partial
 from io import BytesIO
-from re import IGNORECASE, compile
-from time import time
-
-from apscheduler.triggers.interval import IntervalTrigger
-from feedparser import parse as feed_parse
-from httpx import AsyncClient
 from pyrogram.filters import create
 from pyrogram.handlers import MessageHandler
+from time import time
+from re import compile, I
 
-from bot import LOGGER, rss_dict, scheduler
-from bot.core.config_manager import Config
-from bot.helper.ext_utils.bot_utils import arg_parser, get_size_bytes, new_task
-from bot.helper.ext_utils.db_handler import database
-from bot.helper.ext_utils.exceptions import RssShutdownException
-from bot.helper.ext_utils.help_messages import RSS_HELP_MESSAGE
-from bot.helper.ext_utils.status_utils import get_readable_file_size
-from bot.helper.telegram_helper.button_build import ButtonMaker
-from bot.helper.telegram_helper.filters import CustomFilters
-from bot.helper.telegram_helper.message_utils import (
-    delete_message,
-    edit_message,
-    send_file,
+from .. import scheduler, rss_dict, LOGGER
+from ..core.config_manager import Config
+from ..helper.ext_utils.bot_utils import new_task, arg_parser, get_size_bytes
+from ..helper.ext_utils.status_utils import get_readable_file_size
+from ..helper.ext_utils.db_handler import database
+from ..helper.ext_utils.exceptions import RssShutdownException
+from ..helper.ext_utils.help_messages import RSS_HELP_MESSAGE
+from ..helper.telegram_helper.button_build import ButtonMaker
+from ..helper.telegram_helper.filters import CustomFilters
+from ..helper.telegram_helper.message_utils import (
     send_message,
+    edit_message,
     send_rss,
+    send_file,
+    delete_message,
 )
 
 rss_dict_lock = Lock()
 handler_dict = {}
-size_regex = compile(r"(\d+(\.\d+)?\s?(GB|MB|KB|GiB|MiB|KiB))", IGNORECASE)
+size_regex = compile(r"(\d+(\.\d+)?\s?(GB|MB|KB|GiB|MiB|KiB))", I)
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
@@ -97,8 +96,7 @@ async def rss_sub(_, message, pre_event):
         title = args[0].strip()
         if (user_feeds := rss_dict.get(user_id, False)) and title in user_feeds:
             await send_message(
-                message,
-                f"This title {title} already subscribed! Choose another title!",
+                message, f"This title {title} already subscribed! Choose another title!"
             )
             continue
         feed_link = args[1].strip()
@@ -136,10 +134,7 @@ async def rss_sub(_, message, pre_event):
             stv = False
         try:
             async with AsyncClient(
-                headers=headers,
-                follow_redirects=True,
-                timeout=60,
-                verify=False,
+                headers=headers, follow_redirects=True, timeout=60, verify=False
             ) as client:
                 res = await client.get(feed_link)
             html = res.text
@@ -155,11 +150,11 @@ async def rss_sub(_, message, pre_event):
             else:
                 size = 0
             msg += "<b>Subscribed!</b>"
-            msg += (
-                f"\n<b>Title: </b><code>{title}</code>\n<b>Feed Url: </b>{feed_link}"
-            )
+            msg += f"\n<b>Title: </b><code>{title}</code>\n<b>Feed Url: </b>{feed_link}"
             msg += f"\n<b>latest record for </b>{rss_d.feed.title}:"
-            msg += f"\nName: <code>{last_title.replace('>', '').replace('<', '')}</code>"
+            msg += (
+                f"\nName: <code>{last_title.replace('>', '').replace('<', '')}</code>"
+            )
             try:
                 last_link = rss_d.entries[0]["links"][1]["href"]
             except IndexError:
@@ -194,10 +189,10 @@ async def rss_sub(_, message, pre_event):
                             "command": cmd,
                             "sensitive": stv,
                             "tag": tag,
-                        },
+                        }
                     }
             LOGGER.info(
-                f"Rss Feed Added: id: {user_id} - title: {title} - link: {feed_link} - c: {cmd} - inf: {inf} - exf: {exf} - stv: {stv}",
+                f"Rss Feed Added: id: {user_id} - title: {title} - link: {feed_link} - c: {cmd} - inf: {inf} - exf: {exf} - stv: {stv}"
             )
         except (IndexError, AttributeError) as e:
             emsg = f"The link: {feed_link} doesn't seem to be a RSS feed or it's region-blocked!"
@@ -245,7 +240,7 @@ async def rss_update(_, message, pre_event, state):
                 await send_message(message, f"{title} not found!")
                 continue
         istate = rss_dict[user_id][title].get("paused", False)
-        if (istate and state == "pause") or (not istate and state == "resume"):
+        if istate and state == "pause" or not istate and state == "resume":
             await send_message(message, f"{title} already {state}d!")
             continue
         async with rss_dict_lock:
@@ -291,7 +286,7 @@ async def rss_list(query, start, all_users=False):
             index = 0
             for titles in rss_dict.values():
                 for index, (title, data) in enumerate(
-                    list(titles.items())[start : 5 + start],
+                    list(titles.items())[start : 5 + start]
                 ):
                     list_feed += f"\n\n<b>Title:</b> <code>{title}</code>\n"
                     list_feed += f"<b>Feed Url:</b> <code>{data['link']}</code>\n"
@@ -313,16 +308,16 @@ async def rss_list(query, start, all_users=False):
                 list_feed += f"<b>Command:</b> <code>{data['command']}</code>\n"
                 list_feed += f"<b>Inf:</b> <code>{data['inf']}</code>\n"
                 list_feed += f"<b>Exf:</b> <code>{data['exf']}</code>\n"
-                list_feed += f"<b>Sensitive:</b> <code>{data.get('sensitive', False)}</code>\n"
+                list_feed += (
+                    f"<b>Sensitive:</b> <code>{data.get('sensitive', False)}</code>\n"
+                )
                 list_feed += f"<b>Paused:</b> <code>{data['paused']}</code>\n"
     buttons.data_button("Back", f"rss back {user_id}")
     buttons.data_button("Close", f"rss close {user_id}")
     if keysCount > 5:
         for x in range(0, keysCount, 5):
             buttons.data_button(
-                f"{int(x / 5)}",
-                f"rss list {user_id} {x}",
-                position="footer",
+                f"{int(x / 5)}", f"rss list {user_id} {x}", position="footer"
             )
     button = buttons.build_menu(2)
     if query.message.text.html == list_feed:
@@ -349,14 +344,10 @@ async def rss_get(_, message, pre_event):
         if data and count > 0:
             try:
                 msg = await send_message(
-                    message,
-                    f"Getting the last <b>{count}</b> item(s) from {title}",
+                    message, f"Getting the last <b>{count}</b> item(s) from {title}"
                 )
                 async with AsyncClient(
-                    headers=headers,
-                    follow_redirects=True,
-                    timeout=60,
-                    verify=False,
+                    headers=headers, follow_redirects=True, timeout=60, verify=False
                 ) as client:
                     res = await client.get(data["link"])
                 html = res.text
@@ -380,8 +371,7 @@ async def rss_get(_, message, pre_event):
             except IndexError as e:
                 LOGGER.error(str(e))
                 await edit_message(
-                    msg,
-                    "Parse depth exceeded. Try again with a lower value.",
+                    msg, "Parse depth exceeded. Try again with a lower value."
                 )
             except Exception as e:
                 LOGGER.error(str(e))
@@ -409,7 +399,7 @@ async def rss_edit(_, message, pre_event):
                 f"{item}. Wrong Input format. Read help message before editing!",
             )
             continue
-        if not rss_dict[user_id].get(title, False):
+        elif not rss_dict[user_id].get(title, False):
             await send_message(message, "Enter a valid title. Title not found!")
             continue
         updated = True
@@ -468,15 +458,10 @@ async def event_handler(client, query, pfunc):
     async def event_filter(_, __, event):
         user = event.from_user or event.sender_chat
         return bool(
-            user.id == user_id
-            and event.chat.id == query.message.chat.id
-            and event.text,
+            user.id == user_id and event.chat.id == query.message.chat.id and event.text
         )
 
-    handler = client.add_handler(
-        MessageHandler(pfunc, create(event_filter)),
-        group=-1,
-    )
+    handler = client.add_handler(MessageHandler(pfunc, create(event_filter)), group=-1)
     while handler_dict[user_id]:
         await sleep(0.5)
         if time() - start_time > 60:
@@ -492,8 +477,7 @@ async def rss_listener(client, query):
     data = query.data.split()
     if int(data[2]) != user_id and not await CustomFilters.sudo("", query):
         await query.answer(
-            text="You don't have permission to use these buttons!",
-            show_alert=True,
+            text="You don't have permission to use these buttons!", show_alert=True
         )
     elif data[1] == "close":
         await query.answer()
@@ -596,13 +580,13 @@ Timeout: 60 sec. Argument -c for command and arguments
             await update_rss_menu(query)
         elif data[1].endswith("pause"):
             async with rss_dict_lock:
-                for title in list(rss_dict[int(data[2])].keys()):
-                    rss_dict[int(data[2])][title]["paused"] = True
+                for info in rss_dict[int(data[2])].values():
+                    info["paused"] = True
             await database.rss_update(int(data[2]))
         elif data[1].endswith("resume"):
             async with rss_dict_lock:
-                for title in list(rss_dict[int(data[2])].keys()):
-                    rss_dict[int(data[2])][title]["paused"] = False
+                for info in rss_dict[int(data[2])].values():
+                    info["paused"] = False
             if scheduler.state == 2:
                 scheduler.resume()
             await database.rss_update(int(data[2]))
@@ -619,22 +603,23 @@ Timeout: 60 sec. Argument -c for command and arguments
             await update_rss_menu(query)
         elif data[1].endswith("pause"):
             async with rss_dict_lock:
-                for user in list(rss_dict.keys()):
-                    for title in list(rss_dict[user].keys()):
-                        rss_dict[int(data[2])][title]["paused"] = True
+                for user_feeds in rss_dict.values():
+                    for feed in user_feeds.values():
+                        feed["paused"] = True
             if scheduler.running:
                 scheduler.pause()
             await database.rss_update_all()
         elif data[1].endswith("resume"):
             async with rss_dict_lock:
-                for user in list(rss_dict.keys()):
-                    for title in list(rss_dict[user].keys()):
-                        rss_dict[int(data[2])][title]["paused"] = False
+                for user_feeds in rss_dict.values():
+                    for feed in user_feeds.values():
+                        feed["paused"] = False
             if scheduler.state == 2:
                 scheduler.resume()
             elif not scheduler.running:
                 add_job()
                 scheduler.start()
+                await update_rss_menu(query)
             await database.rss_update_all()
     elif data[1] == "deluser":
         if len(rss_dict) == 0:
@@ -688,9 +673,12 @@ async def rss_monitor():
     if isinstance(chat, int):
         rss_chat_id = chat
     elif "|" in chat:
-        rss_chat_id, rss_topic_id = [
-            int(x) if x.lstrip("-").isdigit() else x for x in chat.split("|", 1)
-        ]
+        rss_chat_id, rss_topic_id = list(
+            map(
+                lambda x: int(x) if x.lstrip("-").isdigit() else x,
+                chat.split("|", 1),
+            )
+        )
     elif chat.lstrip("-").isdigit():
         rss_chat_id = int(chat)
     for user, items in list(rss_dict.items()):
@@ -710,7 +698,7 @@ async def rss_monitor():
                             res = await client.get(data["link"])
                         html = res.text
                         break
-                    except Exception:
+                    except:
                         tries += 1
                         if tries > 3:
                             raise
@@ -731,27 +719,21 @@ async def rss_monitor():
                     last_link = entry0.get("link")
                 last_title = entry0.get("title")
                 all_paused = False
-                if (
-                    data["last_feed"] == last_link
-                    or data["last_title"] == last_title
-                ):
+                if data["last_feed"] == last_link or data["last_title"] == last_title:
                     continue
                 feed_count = 0
                 while True:
                     try:
                         await sleep(10)
-                    except Exception:
-                        raise RssShutdownException("Rss Monitor Stopped!") from None
+                    except:
+                        raise RssShutdownException("Rss Monitor Stopped!")
                     try:
                         item_title = rss_d.entries[feed_count]["title"]
                         try:
                             url = rss_d.entries[feed_count]["links"][1]["href"]
                         except IndexError:
                             url = rss_d.entries[feed_count]["link"]
-                        if (
-                            data["last_feed"] == url
-                            or data["last_title"] == item_title
-                        ):
+                        if data["last_feed"] == url or data["last_title"] == item_title:
                             break
                         if rss_d.entries[feed_count].get("size"):
                             size = int(rss_d.entries[feed_count]["size"])
@@ -764,16 +746,14 @@ async def rss_monitor():
                             size = 0
                     except IndexError:
                         LOGGER.warning(
-                            f"Reached Max index no. {feed_count} for this feed: {title}. Maybe you need to use less RSS_DELAY to not miss some torrents",
+                            f"Reached Max index no. {feed_count} for this feed: {title}. Maybe you need to use less RSS_DELAY to not miss some torrents"
                         )
                         break
                     parse = True
                     for flist in data["inf"]:
                         if (
                             data.get("sensitive", False)
-                            and all(
-                                x.lower() not in item_title.lower() for x in flist
-                            )
+                            and all(x.lower() not in item_title.lower() for x in flist)
                         ) or (
                             not data.get("sensitive", False)
                             and all(x not in item_title for x in flist)
@@ -800,7 +780,7 @@ async def rss_monitor():
                         if (
                             size
                             and Config.RSS_SIZE_LIMIT
-                            and size > Config.RSS_SIZE_LIMIT
+                            and Config.RSS_SIZE_LIMIT < size
                         ):
                             feed_count += 1
                             continue
@@ -813,17 +793,17 @@ async def rss_monitor():
                         feed_msg = f"<b>Name: </b><code>{item_title.replace('>', '').replace('<', '')}</code>"
                         feed_msg += f"\n\n<b>Link: </b><code>{url}</code>"
                         if size:
-                            feed_msg += (
-                                f"\n<b>Size: </b>{get_readable_file_size(size)}"
-                            )
-                    feed_msg += f"\n<b>Tag: </b><code>{data['tag']}</code> <code>{user}</code>"
+                            feed_msg += f"\n<b>Size: </b>{get_readable_file_size(size)}"
+                    feed_msg += (
+                        f"\n<b>Tag: </b><code>{data['tag']}</code> <code>{user}</code>"
+                    )
                     await send_rss(feed_msg, rss_chat_id, rss_topic_id)
                     feed_count += 1
                 async with rss_dict_lock:
                     if user not in rss_dict or not rss_dict[user].get(title, False):
                         continue
                     rss_dict[user][title].update(
-                        {"last_feed": last_link, "last_title": last_title},
+                        {"last_feed": last_link, "last_title": last_title}
                     )
                 await database.rss_update(user)
                 LOGGER.info(f"Feed Name: {title}")

@@ -131,7 +131,7 @@ class YoutubeDLHelper:
             )
         if not from_queue:
             await self._listener.on_download_start()
-            if self._listener.multi <= 1:
+            if self._listener.multi <= 1 and not listener.is_rss:
                 await send_status_message(self._listener.message)
 
     def _on_download_error(self, error):

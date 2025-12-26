@@ -1,7 +1,7 @@
 from asyncio import Lock
 
 from pyrogram import Client, enums
-
+from pyrogram.types import LinkPreviewOptions
 from bot import LOGGER
 
 from .config_manager import Config
@@ -29,6 +29,10 @@ class TgClient:
             workdir="/app",
             parse_mode=enums.ParseMode.HTML,
             max_concurrent_transmissions=100,
+            max_message_cache_size=15000,
+            max_topic_cache_size=15000,
+            sleep_threshold=0,
+            link_preview_options=LinkPreviewOptions(is_disabled=True),
         )
         await cls.bot.start()
         cls.NAME = cls.bot.me.username
@@ -44,9 +48,13 @@ class TgClient:
                     Config.TELEGRAM_HASH,
                     proxy=Config.TG_PROXY,
                     session_string=Config.USER_SESSION_STRING,
+                    workdir="/app",
                     parse_mode=enums.ParseMode.HTML,
                     no_updates=True,
                     max_concurrent_transmissions=100,
+                    max_message_cache_size=15000,
+                    max_topic_cache_size=15000,
+                    link_preview_options=LinkPreviewOptions(is_disabled=True),
                 )
                 await cls.user.start()
                 cls.IS_PREMIUM_USER = cls.user.me.is_premium

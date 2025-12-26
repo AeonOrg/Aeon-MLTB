@@ -5,7 +5,7 @@ from os import path as ospath
 from os import walk
 from re import match as re_match
 from time import time
-
+from ... import intervals
 from aiofiles.os import (
     path as aiopath,
 )
@@ -113,7 +113,7 @@ class TelegramUploader:
                     self._sent_msg = await TgClient.user.send_message(
                         chat_id=self._listener.up_dest,
                         text=msg,
-                        disable_web_page_preview=True,
+                        
                         message_thread_id=self._listener.chat_thread_id,
                         disable_notification=True,
                     )
@@ -121,7 +121,7 @@ class TelegramUploader:
                     self._sent_msg = await self._listener.client.send_message(
                         chat_id=self._listener.up_dest,
                         text=msg,
-                        disable_web_page_preview=True,
+                        
                         message_thread_id=self._listener.chat_thread_id,
                         disable_notification=True,
                     )
@@ -139,7 +139,7 @@ class TelegramUploader:
                 self._sent_msg = await TgClient.user.send_message(
                     chat_id=self._listener.message.chat.id,
                     text="Deleted Cmd Message! Don't delete the cmd message again!",
-                    disable_web_page_preview=True,
+                    
                     disable_notification=True,
                 )
         else:
@@ -249,6 +249,8 @@ class TelegramUploader:
                 self._error = ""
                 self._up_path = f_path = ospath.join(dirpath, file_)
                 if not await aiopath.exists(self._up_path):
+                    if intervals["stopAll"]:
+                        return
                     LOGGER.error(f"{self._up_path} not exists! Continue uploading!")
                     continue
                 try:
