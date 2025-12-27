@@ -6,6 +6,7 @@ from os import path as ospath
 from re import search as re_search
 
 from yt_dlp import DownloadError, YoutubeDL
+from secrets import token_hex
 
 from bot import task_dict, task_dict_lock
 from bot.helper.ext_utils.bot_utils import async_to_sync, sync_to_async
