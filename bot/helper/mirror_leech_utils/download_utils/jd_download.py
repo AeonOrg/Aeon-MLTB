@@ -167,13 +167,8 @@ async def add_jd_download(listener, path):
 
             await sleep(1)
             LOGGER.info(f"JDownloader Collecting Data: {listener.link}")
-            try:
-                await wait_for(
-                    jdownloader.device.linkgrabber.wait_for_finished_collecting(),
-                    timeout=60,
-                )
-            except TimeoutError:
-                LOGGER.warning("JDownloader collector timed out.")
+            while await jdownloader.device.linkgrabber.is_collecting():
+                await sleep(0.5)
             LOGGER.info(f"JDownloader Finished Collecting Data: {listener.link}")
             start_time = time()
             online_packages = []

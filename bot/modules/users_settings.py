@@ -11,7 +11,7 @@ from aiofiles.os import path as aiopath
 from pyrogram.filters import create
 from pyrogram.handlers import MessageHandler
 
-from bot import auth_chats, excluded_extensions, sudo_users, user_data
+from bot import auth_chats, included_extensions, excluded_extensions, sudo_users, user_data
 from bot.core.config_manager import Config
 from bot.core.telegram_manager import TgClient
 from bot.helper.ext_utils.bot_utils import (
@@ -338,7 +338,7 @@ Add to Playlist ID: <code>{yt_add_to_playlist_id}</code>"""
         if user_dict.get("INCLUDED_EXTENSIONS", False):
             inc_ex = user_dict["INCLUDED_EXTENSIONS"]
         elif "INCLUDED_EXTENSIONS" not in user_dict:
-            inc_ex = Config.INCLUDED_EXTENSIONS
+            inc_ex = included_extensions
         else:
             inc_ex = "None"
         if user_dict.get("NAME_SUBSTITUTE", False) or (
