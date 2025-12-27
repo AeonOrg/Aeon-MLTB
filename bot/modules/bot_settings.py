@@ -487,15 +487,15 @@ async def edit_bot_settings(client, query):
     elif data[1] == "resetvar":
         await query.answer()
         expected_type = type(getattr(Config, data[2]))
-        if expected_type == bool:
+        if expected_type is bool:
             value = False
-        elif expected_type == int:
+        elif expected_type is int:
             value = 0
-        elif expected_type == str:
+        elif expected_type is str:
             value = ""
-        elif expected_type == list:
+        elif expected_type is list:
             value = []
-        elif expected_type == dict:
+        elif expected_type is dict:
             value = {}
         if data[2] in DEFAULT_VALUES:
             value = DEFAULT_VALUES[data[2]]

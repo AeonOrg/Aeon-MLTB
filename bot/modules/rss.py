@@ -684,10 +684,10 @@ async def rss_monitor():
         rss_chat_id = int(chat)
     for user, items in list(rss_dict.items()):
         for title, data in items.items():
+            if data["paused"]:
+                continue
+            tries = 0
             try:
-                if data["paused"]:
-                    continue
-                tries = 0
                 while True:
                     try:
                         async with AsyncClient(
@@ -699,7 +699,7 @@ async def rss_monitor():
                             res = await client.get(data["link"])
                         html = res.text
                         break
-                    except:
+                    except Exception:
                         tries += 1
                         if tries > 3:
                             raise
@@ -729,8 +729,8 @@ async def rss_monitor():
                 while True:
                     try:
                         await sleep(10)
-                    except:
-                        raise RssShutdownException("Rss Monitor Stopped!")
+                    except Exception as e:
+                        raise RssShutdownException("Rss Monitor Stopped!") from e
                     try:
                         item_title = rss_d.entries[feed_count]["title"]
                         try:
@@ -817,9 +817,6 @@ async def rss_monitor():
                 await database.rss_update(user)
                 LOGGER.info(f"Feed Name: {title}")
                 LOGGER.info(f"Last item: {last_link}")
-            except RssShutdownException as ex:
-                LOGGER.info(ex)
-                break
             except Exception as e:
                 LOGGER.error(f"{e} - Feed Name: {title} - Feed Link: {data['link']}")
                 continue

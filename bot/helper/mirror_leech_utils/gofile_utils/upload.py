@@ -18,6 +18,7 @@ from tenacity import (
     wait_exponential,
 )
 
+from bot import user_data
 from bot.core.config_manager import Config
 from bot.helper.ext_utils.bot_utils import SetInterval, sync_to_async
 
@@ -53,8 +54,6 @@ class GoFileUpload:
         self.update_interval = 3
 
         # Get user-specific token or fall back to global config
-        from bot import user_data
-
         user_dict = user_data.get(self.listener.user_id, {})
         self.token = user_dict.get("GOFILE_TOKEN") or Config.GOFILE_API
         self.folder_id = (
@@ -111,9 +110,11 @@ class GoFileUpload:
         )
 
     async def __getServer(self):
-        async with ClientSession() as session:
-            async with session.get(f"{self.api_url}servers") as resp:
-                return await self.__resp_handler(await resp.json())
+        async with (
+            ClientSession() as session,
+            session.get(f"{self.api_url}servers") as resp,
+        ):
+            return await self.__resp_handler(await resp.json())
 
     async def __getAccount(self, check_account=False):
         if self.token is None:
@@ -174,23 +175,25 @@ class GoFileUpload:
             filename=file_path, read_callback=self.__progress_callback
         ) as file:
             data[req_file] = file
-            async with ClientSession() as session:
-                async with session.post(url, data=data) as resp:
-                    if resp.status == 200:
-                        try:
-                            return await resp.json()
-                        except ContentTypeError:
-                            return {
-                                "status": "ok",
-                                "data": {"downloadPage": "Uploaded"},
-                            }
-                        except JSONDecodeError:
-                            return {
-                                "status": "ok",
-                                "data": {"downloadPage": "Uploaded"},
-                            }
-                    else:
-                        raise Exception(f"HTTP {resp.status}: {await resp.text()}")
+            async with (
+                ClientSession() as session,
+                session.post(url, data=data) as resp,
+            ):
+                if resp.status == 200:
+                    try:
+                        return await resp.json()
+                    except ContentTypeError:
+                        return {
+                            "status": "ok",
+                            "data": {"downloadPage": "Uploaded"},
+                        }
+                    except JSONDecodeError:
+                        return {
+                            "status": "ok",
+                            "data": {"downloadPage": "Uploaded"},
+                        }
+                else:
+                    raise Exception(f"HTTP {resp.status}: {await resp.text()}")
         return None
 
     async def create_folder(self, parentFolderId, folderName):
@@ -340,7 +343,7 @@ class GoFileUpload:
             if (
                 self.listener.is_cancelled and not self._is_errored
             ) or self._is_errored:
-                return
+                pass
 
     async def _upload_process(self):
         if not await self.is_goapi(self.token):

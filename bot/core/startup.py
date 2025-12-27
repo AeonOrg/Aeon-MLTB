@@ -66,7 +66,7 @@ async def update_nzb_options():
         try:
             no = (await sabnzbd_client.get_config())["config"]["misc"]
             nzb_options.update(no)
-        except:
+        except Exception:
             await sleep(0.5)
             continue
         break
