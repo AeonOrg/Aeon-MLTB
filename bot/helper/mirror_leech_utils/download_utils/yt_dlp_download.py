@@ -75,10 +75,10 @@ class YoutubeDLHelper:
             "fragment_retries": 10,
             "retries": 10,
             "retry_sleep_functions": {
-                "http": lambda n: 3,
-                "fragment": lambda n: 3,
-                "file_access": lambda n: 3,
-                "extractor": lambda n: 3,
+                "http": lambda _: 3,
+                "fragment": lambda _: 3,
+                "file_access": lambda _: 3,
+                "extractor": lambda _: 3,
             },
         }
 
@@ -132,7 +132,7 @@ class YoutubeDLHelper:
             )
         if not from_queue:
             await self._listener.on_download_start()
-            if self._listener.multi <= 1 and not listener.is_rss:
+            if self._listener.multi <= 1 and not self._listener.is_rss:
                 await send_status_message(self._listener.message)
 
     def _on_download_error(self, error):
@@ -196,7 +196,7 @@ class YoutubeDLHelper:
             if self._listener.is_cancelled:
                 return
             async_to_sync(self._listener.on_download_complete)
-        except:
+        except Exception:
             pass
         return
 
@@ -361,7 +361,7 @@ class YoutubeDLHelper:
                     self.opts[key].append(value)
             elif key == "download_ranges":
                 if isinstance(value, list):
-                    self.opts[key] = lambda info, ytdl: value
+                    self.opts[key] = lambda _, __, value=value: value
             else:
                 if key == "writethumbnail" and value is True:
                     self.keep_thumb = True

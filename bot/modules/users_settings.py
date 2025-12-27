@@ -338,7 +338,7 @@ Add to Playlist ID: <code>{yt_add_to_playlist_id}</code>"""
         if user_dict.get("INCLUDED_EXTENSIONS", False):
             inc_ex = user_dict["INCLUDED_EXTENSIONS"]
         elif "INCLUDED_EXTENSIONS" not in user_dict:
-            inc_ex = included_extensions
+            inc_ex = Config.INCLUDED_EXTENSIONS
         else:
             inc_ex = "None"
         if user_dict.get("NAME_SUBSTITUTE", False) or (
@@ -507,8 +507,6 @@ async def set_option(_, message, option):
         for x in fx:
             x = x.lstrip(".")
             value.append(x.strip().lower())
-    elif option == "INDEX_URL":
-        value = value
     elif option in ["UPLOAD_PATHS", "FFMPEG_CMDS", "YT_DLP_OPTIONS"]:
         if value.startswith("{") and value.endswith("}"):
             try:

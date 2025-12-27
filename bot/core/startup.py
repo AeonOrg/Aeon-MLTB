@@ -6,6 +6,7 @@ from aiofiles import open as aiopen
 from aiofiles.os import makedirs, remove
 from aiofiles.os import path as aiopath
 from aioshutil import rmtree
+from truelink import TrueLinkResolver
 
 from bot import (
     LOGGER,
@@ -25,6 +26,9 @@ from bot import (
     user_data,
 )
 from bot.helper.ext_utils.db_handler import database
+from bot.helper.mirror_leech_utils.download_utils.insta_resolver import (
+    InstagramResolver,
+)
 
 from .config_manager import Config
 from .telegram_manager import TgClient
@@ -66,7 +70,7 @@ async def update_nzb_options():
         try:
             no = (await sabnzbd_client.get_config())["config"]["misc"]
             nzb_options.update(no)
-        except:
+        except Exception:
             await sleep(0.5)
             continue
         break
@@ -322,16 +326,6 @@ async def load_configurations():
     starts the Gunicorn web server, extracts JDownloader config if present,
     loads shorteners, and sets up service accounts if accounts.zip exists.
     """
-
-    process = await create_subprocess_shell(
-        "uv pip install -U truelink",
-    )
-    await process.wait()
-    from truelink import TrueLinkResolver
-
-    from bot.helper.mirror_leech_utils.download_utils.insta_resolver import (
-        InstagramResolver,
-    )
 
     _ = TrueLinkResolver()
     TrueLinkResolver.register_resolver("instagram.com", InstagramResolver)

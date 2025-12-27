@@ -82,31 +82,31 @@ async def edit_message(
     markdown=False,
     block=True,
 ):
-    # parse_mode = enums.ParseMode.MARKDOWN if markdown else enums.ParseMode.HTML
+    parse_mode = enums.ParseMode.MARKDOWN if markdown else enums.ParseMode.HTML
     try:
         if message.media:
             if photo:
                 return await message.edit_media(
                     InputMediaPhoto(photo, text),
                     reply_markup=buttons,
-                    # parse_mode=parse_mode,
+                    parse_mode=parse_mode,
                 )
             return await message.edit_caption(
                 caption=text,
                 reply_markup=buttons,
-                # parse_mode=parse_mode,
+                parse_mode=parse_mode,
             )
         await message.edit(
             text=text,
             reply_markup=buttons,
-            # parse_mode=parse_mode,
+            parse_mode=parse_mode,
         )
     except FloodWait as f:
         LOGGER.warning(str(f))
         if not block:
             return message
         await sleep(f.value * 1.2)
-        return await edit_message(message, text, buttons, photo)
+        return await edit_message(message, text, buttons, photo, markdown, block)
     except (MessageNotModified, MessageEmpty):
         pass
     except Exception as e:
