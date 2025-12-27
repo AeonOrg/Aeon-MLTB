@@ -110,9 +110,10 @@ class GoFileUpload:
         )
 
     async def __getServer(self):
-        async with ClientSession() as session, session.get(
-            f"{self.api_url}servers"
-        ) as resp:
+        async with (
+            ClientSession() as session,
+            session.get(f"{self.api_url}servers") as resp,
+        ):
             return await self.__resp_handler(await resp.json())
 
     async def __getAccount(self, check_account=False):
@@ -174,7 +175,10 @@ class GoFileUpload:
             filename=file_path, read_callback=self.__progress_callback
         ) as file:
             data[req_file] = file
-            async with ClientSession() as session, session.post(url, data=data) as resp:
+            async with (
+                ClientSession() as session,
+                session.post(url, data=data) as resp,
+            ):
                 if resp.status == 200:
                     try:
                         return await resp.json()
