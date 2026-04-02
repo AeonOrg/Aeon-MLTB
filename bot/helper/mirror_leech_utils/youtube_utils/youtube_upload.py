@@ -524,9 +524,7 @@ class YouTubeUpload(YouTubeHelper):
         title = file_name
         privacy_status = self.privacy
         category_id = self.category
-        description_base = (
-            self.description if self.description else f"Uploaded: {file_name}"
-        )
+        description_base = self.description or f"Uploaded: {file_name}"
         description = f"{description_base}\n\nOriginal filename: {file_name}"
         tags_for_body = self.tags
         if tags_for_body is None:
